@@ -1,17 +1,4 @@
-# Manuscript draft v3: Introduction to Methods
-
-**Status:** working draft, 2026-10-13. No analysis has been run; results are placeholders ([RESULT: …]).
-**Authors:** Pascal Antwi, Tyler Grimes [author list and affiliations to confirm].
-**Target journal:** *Briefings in Bioinformatics* (author guidelines to be checked: article type, word limits, Key Points, reference style).
-
-**How to read the markers:**
-- **†** a proposed default setting, to be confirmed with Tyler before the stage 1 registration (rationale in Supplementary Table S3).
-- **[TBD: …]** a decision or source still needed. **[RESULT: …]** filled in after the analysis.
-- *(unverified)* a reference not yet checked against NCBI or the publisher (NCBI was unreachable when this draft was written). See `references.md`.
-
-Main-text word count: about 5,360 (Key Points 149, Abstract 242, Introduction 989, Methods 3,979).
-
----
+# Manuscript draft 
 
 ## Title options
 
