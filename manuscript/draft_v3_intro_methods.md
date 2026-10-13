@@ -70,7 +70,7 @@ Settings marked † are pre-specified defaults that were fixed in the stage 1 re
 
 Series that duplicate others were excluded (GSE72326 duplicates GSE49454; GSE45291, GSE121239 and GSE224705 share patients and controls, so at most one was used per analysis), using the overlap catalogue of our companion study [REF: paper 1, in preparation]. One sample was used per patient (the first visit in longitudinal cohorts), and technical replicates were averaged.
 
-**Feasibility (go/no-go) check.** Before registration, and without fitting any outcome model, we counted IFN-low patients and controls by inferred sex (Section 2.4) and tabulated batch, age, ancestry and medication by group. A cohort qualified as a **primary cohort** for contrasts with controls if it had at least 80 female IFN-low patients and 60 female controls and if batch was not confounded with group (patients and controls not processed in disjoint batches). These counts give a 95% confidence interval half-width of about ±0.085 for an AUC of 0.70 (Hanley–McNeil). Cohorts with at least 25 patients per group (half-width about ±0.15) qualified as **replication cohorts** and were reported descriptively. [RESULT: cohorts passing the check; N_IFNlow_female and N_HC_female per cohort.]
+**Feasibility (go/no-go) check.** Before registration, and without fitting any outcome model, we counted IFN-low patients and controls by inferred sex (Section 2.4) and tabulated batch, age, ancestry and medication by group. A cohort qualified as a **primary cohort** for contrasts with controls if it had at least 80 female IFN-low patients and 60 female controls and if batch was not confounded with group (patients and controls not processed in disjoint batches). These counts give a 95% confidence interval half-width of about ±0.085 for an AUC of 0.70 (Hanley–McNeil). Cohorts with at least 25 patients per group (half-width about ±0.15) qualified as **replication cohorts** and were reported descriptively.
 
 ### 2.2 Pre-processing and harmonization
 
@@ -78,7 +78,7 @@ Each cohort was processed separately, without cross-cohort batch correction. Aff
 
 ### 2.3 IFN score and IFN-low definition
 
-**IFN score.** The IFN score was the mean of standardized expression values of four ISGs, IFI27, IFI44, IFI44L and RSAD2†, a panel used to stratify patients in clinical trials [TBD: confirm panel and source]. Each gene was standardized with the mean and SD of the **controls in the training fold**.
+**IFN score.** The IFN score was the mean of standardized expression values of four ISGs, IFI27, IFI44, IFI44L and RSAD2†, a panel used to stratify patients in clinical trials. Each gene was standardized with the mean and SD of the **controls in the training fold**.
 
 **IFN-low definition.** A sample was IFN-low if its score was at most the training-fold control mean plus 2 SD. The cutoff was computed inside each training fold and applied unchanged to that fold's test samples, and the same filter was applied to controls (removing about 2.5% of them), so both groups met the same criterion. A stricter cutoff (mean plus 1 SD) was a sensitivity analysis.
 
@@ -96,13 +96,13 @@ We combined design-based controls with explicit confounder baselines.
 
 **Treatment.** A glucocorticoid-response score was computed from the prednisolone-responsive genes of Hu et al. [27] (up-regulated genes†). It served (a) as a baseline model, (b) to define a sensitivity analysis excluding its genes and (c) as an adjustment covariate in the population-level tests. In cohorts that recorded steroid use, we checked that the score tracked recorded use and dose. Medication was not recorded per patient in GSE88884 or GSE319130, so treatment exposure in these cohorts could only be estimated through this score.
 
-**Cell composition.** Whole-blood co-expression is strongly affected by variation in cell-type proportions. For each sample, we computed single-sample scores (singscore) for marker gene sets of neutrophils, monocytes, B cells, plasmablasts, T cells, natural killer cells and eosinophils† [TBD: marker-set source]; because each score uses only that sample, it introduces no leakage. The scores served (a) as a baseline model, (b) as additional conditioning variables in the partial correlations (Section 2.7) and (c) as adjustment covariates in the population-level tests.
+**Cell composition.** Whole-blood co-expression is strongly affected by variation in cell-type proportions. For each sample, we computed single-sample scores (singscore) for marker gene sets of neutrophils, monocytes, B cells, plasmablasts, T cells, natural killer cells and eosinophils†; because each score uses only that sample, it introduces no leakage. The scores served (a) as a baseline model, (b) as additional conditioning variables in the partial correlations (Section 2.7) and (c) as adjustment covariates in the population-level tests.
 
 **Age and ancestry.** Age and recorded race or ancestry were tabulated by group and used as a baseline model and as adjustment covariates; a sensitivity analysis restricted the data to the age range shared by patients and controls. The paediatric cohort (GSE65391) was analysed separately.
 
 ### 2.5 Pathways
 
-Gene sets came from Reactome (release current at registration, accessed through `msigdbr`; version recorded). The primary set comprised the *Immune System* subtree (R-HSA-168256) without the Interferon Signaling subtree. Pathways with more than 50 genes were replaced by their Reactome sub-pathways, so that every network had **15–50 genes** after filtering; this keeps the number of genes well below the roughly 100–150 training samples per fold, which stable partial-correlation estimation requires. Near-duplicate pathways (Jaccard index > 0.8) were reduced to one representative. A secondary analysis used all Reactome pathways meeting the same size criteria. Gene lists were archived with the code. [RESULT: number of pathways after filtering.]
+Gene sets came from Reactome (release current at registration, accessed through `msigdbr`; version recorded). The primary set comprised the *Immune System* subtree (R-HSA-168256) without the Interferon Signaling subtree. Pathways with more than 50 genes were replaced by their Reactome sub-pathways, so that every network had **15–50 genes** after filtering; this keeps the number of genes well below the roughly 100–150 training samples per fold, which stable partial-correlation estimation requires. Near-duplicate pathways (Jaccard index > 0.8) were reduced to one representative. A secondary analysis used all Reactome pathways meeting the same size criteria. Gene lists were archived with the code. 
 
 ### 2.6 Theory: what single-sample networks contain
 
@@ -130,7 +130,7 @@ consistent with [15].
 
   Δ_ij^(q) = (e_ij^(q) − c_ij(R)) / (n + 1)   (4)
 
-exactly, for any association measure. Hence equations (1)–(3) also describe SSN and, if defined analogously, P-SSN [16] [TBD: confirm definition]. SWEET weights an SSN-type network by a sample-specific factor [17], so its edges are a sample-specific multiple of the same quadratic form [TBD: confirm formula]. Derivations, numerical checks and the status of BONOBO [18] are given in Supplementary Appendix A.
+exactly, for any association measure. Hence equations (1)–(3) also describe SSN and, if defined analogously, P-SSN [16]. SWEET weights an SSN-type network by a sample-specific factor [17], so its edges are a sample-specific multiple of the same quadratic form [TBD: confirm formula]. Derivations, numerical checks and the status of BONOBO [18] are given in Supplementary Appendix A.
 
 **Predictions.** Equations (1)–(4) give six predictions, which we tested:
 - **P1 (no new information).** Each edge is a fixed quadratic function of d, so a network contains no information beyond the sample's expression within the pathway; it can only represent that information differently.
@@ -229,13 +229,13 @@ P-values were obtained with 10,000† Freedman–Lane permutations [39], which p
 | S5 | Monotone non-linear dependencies | Rank-based LIONESS |
 | S6 | S1 + S4 + a composition factor | Mixed |
 
-**Settings.** For designs (a) and (b), effect sizes were tuned so that the optimal classifier (the true likelihood ratio) reached an AUC of 0.60, 0.70 or 0.80, and model AUCs were reported relative to this ceiling. Plasmode effect sizes were calibrated in a pilot to give the same three ceiling levels for the oracle model of the injected signal†. Sample sizes were 40 versus 40 and the observed sizes of the primary cohorts [N_IFNlow_female versus N_HC_female]. Tier 1 (single pathway) used 200 replicates per setting; Tier 2 (full pipeline, 30 pathways, 1–3 carrying signal) used 100 replicates† with outer CV reduced to 1 × 5. These counts give Monte Carlo standard errors of at most 0.035 and 0.05 for proportions, which are reported for all estimates.
+**Settings.** For designs (a) and (b), effect sizes were tuned so that the optimal classifier (the true likelihood ratio) reached an AUC of 0.60, 0.70 or 0.80, and model AUCs were reported relative to this ceiling. Plasmode effect sizes were calibrated in a pilot to give the same three ceiling levels for the oracle model of the injected signal†. Sample sizes were 40 versus 40 and the observed sizes of the primary cohorts. Tier 1 (single pathway) used 200 replicates per setting; Tier 2 (full pipeline, 30 pathways, 1–3 carrying signal) used 100 replicates† with outer CV reduced to 1 × 5. These counts give Monte Carlo standard errors of at most 0.035 and 0.05 for proportions, which are reported for all estimates.
 
 **Outputs.** We report AUC relative to the oracle for every model, scenario and setting; power and false-positive rates; the accuracy of equations (1)–(3); recovery of the true signal pathways by stability selection; and the reading guide. If mechanisms could not be distinguished at our sample sizes, mechanistic interpretation of the real data was to be limited to the population-level tests.
 
 ### 2.14 Software, reproducibility, pre-registration and availability
 
-Analyses used R with `corpcor`, `WGCNA`, `glmnet`, `grpreg`, `xgboost`, `pROC`, `singscore`, `SeqNet`, `dnapath` and `lionessR`; versions were fixed with `renv`, workflows were managed with `targets`, seeds were recorded, and a Docker image accompanies the release. The analysis was registered on the Open Science Framework in two stages: stage 1, before any outcome model was fitted (data rules, IFN-low definition, models, hypotheses, inference and all † settings); and stage 2, after the simulation and before any real-data model was fitted (reading guide and simulation-based settings). Deviations are reported [OSF links]. All primary data are public in GEO (Table 1); PRECISESADS data, if used, are available under controlled access from ELIXIR Luxembourg. Code, gene lists and the R implementation of exact LIONESS partial correlation are available at [GitHub URL] and archived at [Zenodo DOI]. AI assistants were used for [planning critique, drafting text and code review]; all analyses, code and text were checked by the authors, who take full responsibility for the content.
+Analyses used R with `corpcor`, `WGCNA`, `glmnet`, `grpreg`, `xgboost`, `pROC`, `singscore`, `SeqNet`, `dnapath` and `lionessR`; versions were fixed with `renv`, workflows were managed with `targets`, seeds were recorded, and a Docker image accompanies the release. The analysis was registered on the Open Science Framework in two stages: stage 1, before any outcome model was fitted (data rules, IFN-low definition, models, hypotheses, inference and all † settings); and stage 2, after the simulation and before any real-data model was fitted (reading guide and simulation-based settings). Deviations are reported [OSF links]. All primary data are public in GEO (Table 1); PRECISESADS data, if used, are available under controlled access from ELIXIR Luxembourg. Code, gene lists and the R implementation of exact LIONESS partial correlation are available at [GitHub URL] and archived at [Zenodo DOI]. AI assistants were used for; all analyses, code and text were checked by the authors, who take full responsibility for the content.
 
 ## Table 1. Candidate cohorts (draft; counts after the go/no-go check to be added)
 
@@ -272,8 +272,7 @@ Substituting and simplifying (the terms aρ_ij and −aρ_ij cancel) gives
 
 **A.8 Numerical checks.** Exact leave-one-out LIONESS on shrinkage partial correlation agreed with equation (2) with correlation 0.997–0.9999 (N = 100–300, G = 12–150, λ = 0–0.7), and better than equation (1) when λ > 0 (for example 0.9987 versus 0.9955 at N = 130, G = 150, λ = 0.7). Equation (4) held to machine precision (maximum absolute difference about 10⁻¹⁶) for Pearson and shrinkage partial correlation. Exact training (leave-one-out) and test (add-one-in) edges had equal spread (ratio 0.98–1.03). Code is provided with the article.
 
-**A.9 SWEET and BONOBO.** [TBD: derive from the published definitions; if BONOBO's posterior mean is linear in ddᵀ, the same first-order argument applies.]
-
+**A.9 SWEET and BONOBO.** 
 ## Supplementary Section S2. Population-level test statistics
 
 **S2.1 Freedman–Lane adjustment.** For pathway expression Y (n × G) and covariates Z, fit Y = Zβ + E without the group label, giving fitted values Ŷ and residuals R̂. For each permutation π, form Y* = Ŷ + R̂_π, regress Y* on Z, and compute the statistic on the residuals split by the observed labels; the observed statistic uses the identity permutation.
