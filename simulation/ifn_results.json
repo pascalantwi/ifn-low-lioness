@@ -1,0 +1,118 @@
+{
+ "IFN-low vs healthy | No real difference": {
+  "auc": {
+   "Leftover IFN score": [
+    0.6920870504870876,
+    0.014260380576194442
+   ],
+   "Gene levels": [
+    0.5516740106803371,
+    0.01906832128506213
+   ],
+   "Gene levels + IFN score": [
+    0.6647982615446647,
+    0.01898954417618434
+   ],
+   "Quadratic classifier": [
+    0.530694154666514,
+    0.02415030803694236
+   ],
+   "LIONESS links": [
+    0.4949459016751411,
+    0.022199315352120864
+   ],
+   "Gene levels + LIONESS + IFN score": [
+    0.5947120702219862,
+    0.021529245597208584
+   ]
+  },
+  "patients_in_analysis": 125.13333333333334
+ },
+ "IFN-low vs healthy | Gene levels differ": {
+  "auc": {
+   "Leftover IFN score": [
+    0.6892603188238684,
+    0.012654632932014355
+   ],
+   "Gene levels": [
+    0.6675449692307575,
+    0.01609841319309028
+   ],
+   "Gene levels + IFN score": [
+    0.7453382750495231,
+    0.014246533008647538
+   ],
+   "Quadratic classifier": [
+    0.6255012213390482,
+    0.016257271224174218
+   ],
+   "LIONESS links": [
+    0.5062299838131272,
+    0.014242304527468129
+   ],
+   "Gene levels + LIONESS + IFN score": [
+    0.6667905157865286,
+    0.017746163235506342
+   ]
+  },
+  "patients_in_analysis": 119.23333333333333
+ },
+ "IFN-low vs healthy | Genes rewired": {
+  "auc": {
+   "Leftover IFN score": [
+    0.7033359906481096,
+    0.011036996442497404
+   ],
+   "Gene levels": [
+    0.5555216288121705,
+    0.021111444497201873
+   ],
+   "Gene levels + IFN score": [
+    0.677486140086918,
+    0.018181108830369944
+   ],
+   "Quadratic classifier": [
+    0.6388239968333412,
+    0.01947630246825878
+   ],
+   "LIONESS links": [
+    0.593143892363323,
+    0.015006770880032713
+   ],
+   "Gene levels + LIONESS + IFN score": [
+    0.6755958712718432,
+    0.017366810250790586
+   ]
+  },
+  "patients_in_analysis": 122.2
+ },
+ "IFN-high vs healthy | No real difference": {
+  "auc": {
+   "Leftover IFN score": [
+    0.9999872695658872,
+    1.413586398600936e-05
+   ],
+   "Gene levels": [
+    0.7606812754213491,
+    0.010379035386571967
+   ],
+   "Gene levels + IFN score": [
+    0.999087063530013,
+    0.00028040461084191117
+   ],
+   "Quadratic classifier": [
+    0.7342612209366758,
+    0.012509610907148418
+   ],
+   "LIONESS links": [
+    0.5142903120748731,
+    0.015541983385661285
+   ],
+   "Gene levels + LIONESS + IFN score": [
+    0.9900393121581875,
+    0.0017067128390579037
+   ]
+  },
+  "patients_in_analysis": 239.63333333333333
+ }
+}
