@@ -70,7 +70,7 @@
 2. Keep the leftover IFN score as the baseline every model must beat.
 3. Re-justify the balanced reference.
 4. Report the direct tests as the main way to describe how IFN-low lupus differs.
-5. Scale up the full simulation (more genes, plasmode data, more repeats).
+5. Scale up the full simulation (more genes, simulations built from real control samples with known signals added, more repeats).
 
 ## Files
 
