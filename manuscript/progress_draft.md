@@ -58,15 +58,15 @@ Each cohort was processed separately, and no batch correction was applied across
 
 The interferon (IFN) status of each sample was summarized by an IFN score based on four interferon-stimulated genes, IFI27, IFI44, IFI44L and RSAD2, the panel used to stratify patients in clinical trials of type I IFN blockade [[14]](https://pubmed.ncbi.nlm.nih.gov/31660791/). Each gene was first standardized using the mean and SD of the healthy controls in the training fold,
 
-$$z_{gs} = \frac{x_{gs} - \bar{x}_g^{\mathrm{HC}}}{s_g^{\mathrm{HC}}},$$
+$$z_{gs} = \frac{x_{gs} - \bar{x}_g^{\mathrm{HC}}}{s_g^{\mathrm{HC}}}, \tag{1}$$
 
 where $x_{gs}$ is the expression of gene $g$ in sample $s$, and $\bar{x}_g^{\mathrm{HC}}$ and $s_g^{\mathrm{HC}}$ are the mean and SD of gene $g$ among the training-fold controls. The IFN score of sample $s$ was the average of these four standardized values,
 
-$$S_s = \frac{1}{4} \sum_{g \in \mathcal{G}_{\mathrm{IFN}}} z_{gs}, \qquad \mathcal{G}_{\mathrm{IFN}} = \{\mathrm{IFI27}, \mathrm{IFI44}, \mathrm{IFI44L}, \mathrm{RSAD2}\}.$$
+$$S_s = \frac{1}{4} \sum_{g \in \mathcal{G}_{\mathrm{IFN}}} z_{gs}, \qquad \mathcal{G}_{\mathrm{IFN}} = \{\mathrm{IFI27}, \mathrm{IFI44}, \mathrm{IFI44L}, \mathrm{RSAD2}\}. \tag{2}$$
 
 A sample was classified as IFN-low if its score did not exceed the control mean by more than two SD,
 
-$$S_s \le c, \qquad c = \bar{S}^{\mathrm{HC}} + 2\, s_S^{\mathrm{HC}},$$
+$$S_s \le c, \qquad c = \bar{S}^{\mathrm{HC}} + 2\, s_S^{\mathrm{HC}}, \tag{3}$$
 
 where $\bar{S}^{\mathrm{HC}}$ and $s_S^{\mathrm{HC}}$ are the mean and SD of the IFN score among the training-fold controls. The cutoff $c$ was computed inside each training fold and applied unchanged to the test samples of that fold. The same rule was applied to controls, which removed about 2.5% of them, so that patients and controls met the same criterion. A stricter cutoff, $c = \bar{S}^{\mathrm{HC}} + s_S^{\mathrm{HC}}$, was used as a sensitivity analysis.
 
