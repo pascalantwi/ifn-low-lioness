@@ -226,35 +226,61 @@ The implementation was checked against direct recomputation of equation (13) for
 
 ### 2.8 Topology features
 
-The same topology features were computed from the Pearson and the partial-correlation networks. LIONESS edges are signed, can lie outside the range $`[-1, 1]`$, and are present between every pair of genes, so each sample has a complete, weighted network for each pathway. For sample $`q`$ and a given pathway, let $`\mathbf{W}^{(q)}`$ be the $`G \times G`$ matrix of rescaled edges, with zeros on the diagonal and off-diagonal entries
+The same topology features were computed from the Pearson and the partial-correlation networks. LIONESS edges are signed, can lie outside the range $`[-1, 1]`$, and are present between every pair of genes, so each sample has a complete, weighted network for each pathway. Features that require a threshold to remove weak edges, such as degree, betweenness or modularity, were therefore not used, because their values depend on an arbitrary choice of threshold. For sample $`q`$ and a given pathway, let $`\mathbf{W}^{(q)}`$ be the $`G \times G`$ matrix of rescaled edges, with zeros on the diagonal and off-diagonal entries
 
 ```math
 w_{ij}^{(q)} = \frac{e_{ij}^{(q)}}{\kappa} \qquad\qquad (15)
 ```
 
-where $`\kappa`$ is the 99th percentile of $`|e_{ij}|`$ over all training samples and gene pairs of that pathway and association measure. Because the same factor $`\kappa`$ is used for every sample, the rescaling puts the edges on a common scale without removing genuine differences in edge size between samples.
+where $`\kappa`$ is the 99th percentile of $`|e_{ij}|`$ over all training samples and gene pairs of that pathway and association measure. Because the same factor $`\kappa`$ is used for every sample, the rescaling puts the edges on a common scale without removing genuine differences in edge size between samples. In what follows, the superscript $`(q)`$ is dropped, and $`m = G(G-1)/2`$ denotes the number of gene pairs.
 
-Five features were pre-specified for each sample and pathway. The first two are the positive and negative strength of each gene, which add up its positive and negative edges separately so that they do not cancel:
-
-```math
-s_i^{+} = \sum_{j \ne i} \max\big(w_{ij}^{(q)}, 0\big), \qquad s_i^{-} = \sum_{j \ne i} \max\big(-w_{ij}^{(q)}, 0\big) \qquad\qquad (16)
-```
-
-The third is the mean absolute edge weight, which summarizes the overall strength of the network:
+Three features were computed for each gene. The positive and negative strength of gene $`i`$ add up its positive and negative edges separately, so that they do not cancel:
 
 ```math
-\bar{w}^{(q)} = \frac{2}{G(G-1)} \sum_{i < j} \big|w_{ij}^{(q)}\big| \qquad\qquad (17)
+s_i^{+} = \sum_{j \ne i} \max\big(w_{ij}, 0\big), \qquad s_i^{-} = \sum_{j \ne i} \max\big(-w_{ij}, 0\big) \qquad\qquad (16)
 ```
 
-The fourth is the largest eigenvalue of $`\mathbf{W}^{(q)}`$, which is large when many genes are connected in a single coordinated block. The fifth is the distance between the sample's network and the reference network,
+The signed clustering coefficient measures whether the neighbours of gene $`i`$ are also linked to each other, that is, whether the gene sits in tightly knit triangles of genes. Following the weighted definition of Zhang and Horvath [[26]](https://doi.org/10.2202/1544-6115.1128), extended to signed weights by Costantini and Perugini [[27]](https://doi.org/10.1371/journal.pone.0088669), it is
 
 ```math
-D^{(q)} = \big\|\mathbf{W}^{(q)} - \mathbf{P}\big\|_F = \sqrt{\sum_{i \ne j} \big(w_{ij}^{(q)} - p_{ij}\big)^2} \qquad\qquad (18)
+C_i = \frac{\sum_{j \ne i} \sum_{k \ne i, j} w_{ij}\, w_{jk}\, w_{ki}}{\sum_{j \ne i} \sum_{k \ne i, j} |w_{ij}|\, |w_{ki}|} \qquad\qquad (17)
 ```
 
-where $`\mathbf{P}`$ is the reference association matrix ($`r_{ij}`$ or $`\rho_{ij}`$, rescaled by the same $`\kappa`$ and with zeros on the diagonal) and $`\|\cdot\|_F`$ is the Frobenius norm, the square root of the sum of squared entries. By equation (8), an edge departs from its reference value through the products and squares of the sample's residuals, so $`D^{(q)}`$ grows with how far the sample lies from the reference centre and was interpreted as a measure of distance rather than of rewiring.
+It is positive when the triangles around gene $`i`$ are mostly consistent in sign (for example, three positive edges) and negative when they are mostly inconsistent.
 
-Together these features give $`2G + 3`$ values per sample and pathway: the positive and negative strength of each of the $`G`$ genes, plus the mean absolute edge weight, the largest eigenvalue and the distance from the reference. They formed the input to the topology models (Section 2.9).
+Six features were computed for the network as a whole. The mean absolute edge weight summarizes the overall strength of the network,
+
+```math
+\bar{w} = \frac{1}{m} \sum_{i < j} |w_{ij}| \qquad\qquad (18)
+```
+
+The proportion of positive edges describes the balance between positive and negative associations,
+
+```math
+\pi^{+} = \frac{1}{m} \sum_{i < j} \mathbb{1}\big(w_{ij} > 0\big) \qquad\qquad (19)
+```
+
+where $`\mathbb{1}(\cdot)`$ equals 1 when the condition holds and 0 otherwise. The edge-weight entropy measures how evenly the total connection strength is spread across gene pairs. With $`p_{ij} = |w_{ij}| / \sum_{k < l} |w_{kl}|`$,
+
+```math
+H = -\frac{1}{\log m} \sum_{i < j} p_{ij} \log p_{ij} \qquad\qquad (20)
+```
+
+which equals 1 when all edges have the same size and approaches 0 when the strength is concentrated in a few edges. The largest eigenvalue of $`\mathbf{W}`$ is large when many genes are connected in a single coordinated block. The last two features compare the sample's network with the reference network $`\mathbf{P}`$, the matrix of reference associations ($`r_{ij}`$ or $`\rho_{ij}`$), rescaled by the same $`\kappa`$ and with zeros on the diagonal. The distance from the reference is
+
+```math
+D = \big\|\mathbf{W} - \mathbf{P}\big\|_F = \sqrt{\sum_{i \ne j} \big(w_{ij} - p_{ij}\big)^2} \qquad\qquad (21)
+```
+
+where $`\|\cdot\|_F`$ is the Frobenius norm, the square root of the sum of squared entries, and the similarity to the reference is the Pearson correlation between the two sets of edges,
+
+```math
+R = \mathrm{cor}\big(\lbrace w_{ij} \rbrace_{i<j},\; \lbrace p_{ij} \rbrace_{i<j}\big) \qquad\qquad (22)
+```
+
+The two measures answer different questions: $`D`$ reflects how large the departures from the reference are, whereas $`R`$ reflects whether the overall pattern of edges is preserved, regardless of their size. By equation (8), an edge departs from its reference value through the products and squares of the sample's residuals, so $`D`$ grows with how far the sample lies from the reference centre and was interpreted as a measure of distance rather than of rewiring.
+
+Together, these features give $`3G + 6`$ values per sample and pathway: the positive strength, negative strength and signed clustering coefficient of each of the $`G`$ genes, plus the six network-level features. They formed the input to the topology models (Section 2.9).
 
 ### 2.9 Baseline and comparator models
 
@@ -330,11 +356,13 @@ Together these features give $`2G + 3`$ values per sample and pathway: the posit
 23. Liu X, et al. Personalized characterization of diseases using sample-specific networks. *Nucleic Acids Res* 2016. PMID [27596597](https://pubmed.ncbi.nlm.nih.gov/27596597/).
 24. Huang Y, et al. Disease characterization using a partial correlation-based sample-specific network. *Brief Bioinform* 2021. PMID [32422654](https://pubmed.ncbi.nlm.nih.gov/32422654/).
 25. Kuijjer ML, et al. lionessR: single sample network inference in R. *BMC Cancer* 2019. PMID [31653243](https://pubmed.ncbi.nlm.nih.gov/31653243/).
-26. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
-27. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
-28. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining* 2016:785–794. doi:[10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785).
-29. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
-30. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
+26. Zhang B, Horvath S. A general framework for weighted gene co-expression network analysis. *Stat Appl Genet Mol Biol* 2005;4:Article17. doi:[10.2202/1544-6115.1128](https://doi.org/10.2202/1544-6115.1128).
+27. Costantini G, Perugini M. Generalization of clustering coefficients to signed correlation networks. *PLoS One* 2014;9(2):e88669. doi:[10.1371/journal.pone.0088669](https://doi.org/10.1371/journal.pone.0088669).
+28. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
+29. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
+30. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining* 2016:785–794. doi:[10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785).
+31. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
+32. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
 
 ## Supplementary material
 
