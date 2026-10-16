@@ -128,7 +128,45 @@ For the comparisons involving IFN-low patients, pathways were drawn from the Rea
 
 ### 2.6 Theory
 
-[Not yet written]
+This section describes what a LIONESS edge contains, so that the network features can be interpreted and compared with suitable baselines. Consider a pathway of $`G`$ genes and a reference set of $`N`$ samples. For a sample $`q`$, let $`\mathbf{x}_q`$ be its expression vector, $`\boldsymbol{\mu}`$ the reference mean and $`\mathbf{d} = \mathbf{x}_q - \boldsymbol{\mu}`$ its deviation from that mean. Let $`\mathbf{S}`$ be the reference covariance matrix (with divisor $`N`$), and let
+
+```math
+\boldsymbol{\Sigma}_\lambda = (1-\lambda)\,\mathbf{S} + \lambda\,\mathrm{diag}(\mathbf{S}), \qquad \boldsymbol{\Omega} = \boldsymbol{\Sigma}_\lambda^{-1}, \qquad \rho_{ij} = -\frac{\Omega_{ij}}{\sqrt{\Omega_{ii}\,\Omega_{jj}}} \qquad\qquad (4)
+```
+
+be the shrinkage covariance with a fixed intensity $`\lambda \in [0, 1]`$ [[19]](https://pubmed.ncbi.nlm.nih.gov/16646851/), its inverse (the precision matrix) and the partial correlation between genes $`i`$ and $`j`$ given the other genes in the pathway. The LIONESS edge for sample $`q`$ is [[20]](https://pubmed.ncbi.nlm.nih.gov/30981959/)
+
+```math
+e_{ij}^{(q)} = N\,\rho_{ij} - (N-1)\,\rho_{ij}^{(-q)} \qquad\qquad (5)
+```
+
+where $`\rho_{ij}^{(-q)}`$ is the partial correlation estimated without sample $`q`$. Equation (5) has exactly the form of a jackknife pseudo-value [[21]](https://scholar.google.com/scholar?q=Tukey+1958+Bias+and+confidence+in+not-quite+large+samples), a quantity that has already been used for differential network analysis [[22]](https://pubmed.ncbi.nlm.nih.gov/36624383/). Pseudo-values approximate the influence function of a statistic, that is, the effect of a single observation on its value; for the Pearson correlation this influence function is classical [[23]](https://doi.org/10.1093/biomet/62.3.531). The results below make this connection explicit for partial correlation, with and without shrinkage.
+
+Let $`\mathbf{u} = \boldsymbol{\Omega}\mathbf{d}`$ and $`\tilde{u}_i = u_i / \sqrt{\Omega_{ii}}`$. Up to scaling, $`\tilde{u}_i`$ is the residual of gene $`i`$ in sample $`q`$ after regression on the other genes of the pathway, divided by its standard deviation. Across the reference population, $`\tilde{u}_i`$ has variance 1, and two residuals have covariance $`-\rho_{ij}`$. Without shrinkage ($`\lambda = 0`$), expanding equation (5) to first order in $`1/(N-1)`$ gives
+
+```math
+e_{ij}^{(q)} \approx \tilde{u}_i\,\tilde{u}_j + \rho_{ij}\left(1 + \frac{\tilde{u}_i^2 + \tilde{u}_j^2}{2}\right) \qquad\qquad (6)
+```
+
+With shrinkage, $`\boldsymbol{\Sigma}_\lambda`$ is still linear in $`\mathbf{S}`$ when $`\lambda`$ is fixed, and the same expansion gives
+
+```math
+e_{ij}^{(q)} \approx \rho_{ij} + \tilde{M}_{ij} + \rho_{ij}\,\frac{\tilde{M}_{ii} + \tilde{M}_{jj}}{2}, \qquad \mathbf{M} = (1-\lambda)\,\mathbf{u}\mathbf{u}^{\top} + \lambda\,\boldsymbol{\Omega}\mathbf{D}_d\boldsymbol{\Omega} \qquad\qquad (7)
+```
+
+where $`\mathbf{D}_d = \mathrm{diag}(d_1^2, \ldots, d_G^2)`$ and $`\tilde{M}_{ij} = M_{ij} / \sqrt{\Omega_{ii}\,\Omega_{jj}}`$. Equation (7) reduces to equation (6) when $`\lambda = 0`$. In both cases the average edge over the reference population equals $`\rho_{ij}`$, as LIONESS requires. For comparison, the corresponding expansion for Pearson correlation $`r_{ij}`$ and standardized expression values $`z_i`$ is $`e_{ij}^{(q)} \approx z_i z_j + r_{ij}\{1 - (z_i^2 + z_j^2)/2\}`$, which is the Pearson correlation plus its classical influence function [[23]](https://doi.org/10.1093/biomet/62.3.531).
+
+The sample-specific network (SSN) method defines an edge as the change in an association measure $`c`$ when sample $`q`$ is added to a reference set $`R`$ of $`n`$ samples, $`\Delta_{ij}^{(q)} = c_{ij}(R \cup \{q\}) - c_{ij}(R)`$ [[24]](https://pubmed.ncbi.nlm.nih.gov/27596597/). LIONESS with the same reference gives $`e_{ij}^{(q)} = (n+1)\,c_{ij}(R \cup \{q\}) - n\,c_{ij}(R)`$, and therefore
+
+```math
+\Delta_{ij}^{(q)} = \frac{e_{ij}^{(q)} - c_{ij}(R)}{n+1} \qquad\qquad (8)
+```
+
+exactly, for any association measure. Equations (6) and (7) therefore also describe SSN and its partial-correlation version, P-SSN [[25]](https://pubmed.ncbi.nlm.nih.gov/32422654/), up to a fixed rescaling of each edge.
+
+These results lead to six predictions. First, because each edge is a function of the sample's own expression values within the pathway, a single-sample network contains no information beyond those values; it can only represent that information in a different way. Second, a linear model on a pathway's edges is a quadratic function of $`\mathbf{d}`$, so its natural competitor is a quadratic classifier applied directly to the pathway's expression values. Third, because each edge is an even function of $`\mathbf{d}`$, its average is unchanged when a group differs from the reference only by a uniform change in spread, and, when the reference contains both groups in equal numbers, also when the groups differ only in their mean expression; edges are therefore expected to separate groups mainly through differences in correlation structure. Fourth, the squared terms carry a positive sign for partial correlation and a negative sign for Pearson correlation, so samples that lie far from the reference mean strengthen partial-correlation edges but weaken Pearson edges. Fifth, node strength, the sum of a gene's edges, is approximately $`\tilde{u}_i \sum_{j \ne i} \tilde{u}_j`$ plus squared terms, and is therefore closely related to the distance-from-health baseline (M4, Section 2.9). Sixth, for edge-level features, SSN, P-SSN and LIONESS differ only by a fixed rescaling of each edge, so any difference in their performance must come from the topology summaries or from the choice of reference.
+
+The approximations were used only for interpretation and for the design of baselines. All network features were computed with exact LIONESS (Section 2.7), and the agreement between exact and first-order edges, including in the tails of the distribution, is reported.
 
 ### 2.7 LIONESS partial-correlation estimation
 
@@ -148,15 +186,15 @@ Two baselines tested the simplest explanations for any separation between IFN-lo
 
 #### 2.9.2 Expression-based comparators
 
-Four comparators used gene expression without any network structure. M1 applied an elastic net [[19]](https://doi.org/10.1111/j.1467-9868.2005.00503.x) or a random forest [[20]](https://doi.org/10.1023/A:1010933404324) to all genes, the standard approach of entering every gene into a single model. M2 fitted one model per pathway on gene expression and combined the pathway models in the same way as the LIONESS models (Section 2.10); it asked whether any gain comes from the pathways themselves rather than from the networks. M3 summarized each pathway by a single activity score (singscore [[16]](https://doi.org/10.1186/s12859-018-2435-4), mean z-score or first principal component), the classic pathway-activity approach, and also applied non-linear models, gradient boosting [[21]](https://doi.org/10.1145/2939672.2939785) and a kernel support vector machine [[22]](https://doi.org/10.1007/BF00994018), to pathway expression, which capture general interactions between genes without using network structure. M4 measured, for each pathway, how far a patient lies from the healthy centre, as the sum of squared standardized expression values or as the Mahalanobis distance, and asked whether patients simply scatter further from the healthy centre than controls do.
+Four comparators used gene expression without any network structure. M1 applied an elastic net [[26]](https://doi.org/10.1111/j.1467-9868.2005.00503.x) or a random forest [[27]](https://doi.org/10.1023/A:1010933404324) to all genes, the standard approach of entering every gene into a single model. M2 fitted one model per pathway on gene expression and combined the pathway models in the same way as the LIONESS models (Section 2.10); it asked whether any gain comes from the pathways themselves rather than from the networks. M3 summarized each pathway by a single activity score (singscore [[16]](https://doi.org/10.1186/s12859-018-2435-4), mean z-score or first principal component), the classic pathway-activity approach, and also applied non-linear models, gradient boosting [[28]](https://doi.org/10.1145/2939672.2939785) and a kernel support vector machine [[29]](https://doi.org/10.1007/BF00994018), to pathway expression, which capture general interactions between genes without using network structure. M4 measured, for each pathway, how far a patient lies from the healthy centre, as the sum of squared standardized expression values or as the Mahalanobis distance, and asked whether patients simply scatter further from the healthy centre than controls do.
 
 #### 2.9.3 Established network comparators
 
-Two comparators represented network methods already used in lupus research. W1 reproduced a typical published weighted gene co-expression network analysis (WGCNA) [[23]](https://pubmed.ncbi.nlm.nih.gov/19114008/) and hub-gene pipeline, with every step fitted within the training folds to avoid data leakage. W2 used WGCNA module eigengenes, the summary scores of gene modules, estimated only from training data; W2 was the main established-network comparator.
+Two comparators represented network methods already used in lupus research. W1 reproduced a typical published weighted gene co-expression network analysis (WGCNA) [[30]](https://pubmed.ncbi.nlm.nih.gov/19114008/) and hub-gene pipeline, with every step fitted within the training folds to avoid data leakage. W2 used WGCNA module eigengenes, the summary scores of gene modules, estimated only from training data; W2 was the main established-network comparator.
 
 #### 2.9.4 LIONESS models
 
-Four models used single-sample networks estimated by LIONESS [[24]](https://pubmed.ncbi.nlm.nih.gov/30981959/). L1 used the edges of the partial-correlation networks as features. L2, the main model, used network summary features such as node strength and clustering (Section 2.8). L2-P was identical to L2 except that Pearson correlation replaced partial correlation, and asked whether partial correlation matters. L3 combined L2 with M2 and M0a, so that the network features were added to both pathway expression and the residual IFN score.
+Four models used single-sample networks estimated by LIONESS [[20]](https://pubmed.ncbi.nlm.nih.gov/30981959/). L1 used the edges of the partial-correlation networks as features. L2, the main model, used network summary features such as node strength and clustering (Section 2.8). L2-P was identical to L2 except that Pearson correlation replaced partial correlation, and asked whether partial correlation matters. L3 combined L2 with M2 and M0a, so that the network features were added to both pathway expression and the residual IFN score.
 
 #### 2.9.5 Primary comparison
 
@@ -214,12 +252,18 @@ The primary hypothesis was tested by comparing L3 with a reference model, M5, th
 16. Foroutan M, Bhuva DD, Lyu R, et al. Single sample scoring of molecular phenotypes. *BMC Bioinformatics* 2018;19(1):404. doi:[10.1186/s12859-018-2435-4](https://doi.org/10.1186/s12859-018-2435-4).
 17. Liberzon A, Subramanian A, Pinchback R, et al. Molecular signatures database (MSigDB) 3.0. *Bioinformatics* 2011;27(12):1739–1740. PMID [21546393](https://pubmed.ncbi.nlm.nih.gov/21546393/).
 18. Dolgalev I. msigdbr: MSigDB gene sets for multiple organisms in a tidy data format. R package. [CRAN](https://cran.r-project.org/web/packages/msigdbr/index.html).
-19. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
-20. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
-21. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining* 2016:785–794. doi:[10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785).
-22. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
-23. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
-24. Kuijjer ML, Tung MG, Yuan G, Quackenbush J, Glass K. Estimating sample-specific regulatory networks. *iScience* 2019;14:226–240. PMID [30981959](https://pubmed.ncbi.nlm.nih.gov/30981959/).
+19. Schäfer J, Strimmer K. A shrinkage approach to large-scale covariance matrix estimation and implications for functional genomics. *Stat Appl Genet Mol Biol* 2005;4:Article32. PMID [16646851](https://pubmed.ncbi.nlm.nih.gov/16646851/).
+20. Kuijjer ML, Tung MG, Yuan G, Quackenbush J, Glass K. Estimating sample-specific regulatory networks. *iScience* 2019;14:226–240. PMID [30981959](https://pubmed.ncbi.nlm.nih.gov/30981959/).
+21. Tukey JW. Bias and confidence in not-quite large samples (abstract). *Ann Math Stat* 1958;29(2):614.
+22. Ahn S, Grimes T, Datta S. A pseudo-value regression approach for differential network analysis of co-expression data. *BMC Bioinformatics* 2023;24(1):8. PMID [36624383](https://pubmed.ncbi.nlm.nih.gov/36624383/).
+23. Devlin SJ, Gnanadesikan R, Kettenring JR. Robust estimation and outlier detection with correlation coefficients. *Biometrika* 1975;62(3):531–545. doi:[10.1093/biomet/62.3.531](https://doi.org/10.1093/biomet/62.3.531).
+24. Liu X, et al. Personalized characterization of diseases using sample-specific networks. *Nucleic Acids Res* 2016. PMID [27596597](https://pubmed.ncbi.nlm.nih.gov/27596597/).
+25. Huang Y, et al. Disease characterization using a partial correlation-based sample-specific network. *Brief Bioinform* 2021. PMID [32422654](https://pubmed.ncbi.nlm.nih.gov/32422654/).
+26. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
+27. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
+28. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining* 2016:785–794. doi:[10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785).
+29. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
+30. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
 
 ## Supplementary material
 
