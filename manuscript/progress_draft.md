@@ -108,7 +108,27 @@ Hydroxychloroquine and immunosuppressants can lower the IFN signature, so some p
 
 ### 2.4 Confounding control
 
-[Not yet written]
+Differences between IFN-low patients and controls could arise from factors other than disease. Five such factors were addressed: sex, batch, treatment, cell composition, and age and ancestry. Each was handled either by the study design or by an explicit baseline model and adjustment covariate.
+
+#### 2.4.1 Sex
+
+Sex was inferred from the expression of Y-chromosome genes (RPS4Y1, DDX3Y, KDM5D, UTY and EIF1AY) rather than from XIST, because XIST expression is unreliable for this purpose in SLE: in GSE319130, 54% of male patients (22 of 41) showed elevated XIST expression [[2]](https://pubmed.ncbi.nlm.nih.gov/42039161/). Inferred sex was compared with reported sex where it was available. The primary analysis was restricted to females. X-chromosome genes were retained, because removing them would delete immune genes located on the X chromosome, such as TLR7, CXCR3, CD40LG and FOXP3. A sensitivity analysis included both sexes after removing the Y-chromosome genes and XIST/TSIX.
+
+#### 2.4.2 Batch
+
+Cohorts in which patients and controls had been processed in separate batches were not eligible as primary cohorts (Section 2.1). Within eligible cohorts, cross-validation folds were stratified by batch, batch was included as an adjustment covariate in the population-level tests (Section 2.2), and the distribution of batches by group is reported.
+
+#### 2.4.3 Treatment
+
+Glucocorticoids change blood gene expression and could therefore create differences between patients and controls that are unrelated to disease. A glucocorticoid-response score was computed for each sample with singscore [[16]](https://doi.org/10.1186/s12859-018-2435-4) from the 64 genes that Hu et al. found to be up-regulated by glucocorticoids [[4]](https://pubmed.ncbi.nlm.nih.gov/29534336/). The score served three purposes: as a baseline model (M0b, Section 2.9), to define a sensitivity analysis in which its genes were removed from the network features, and as an adjustment covariate in the population-level tests. In cohorts that recorded steroid use or dose, we checked that the score was associated with the recorded treatment. Where medication was not recorded for each patient, treatment exposure could be estimated only through this score.
+
+#### 2.4.4 Cell composition
+
+Gene co-expression in whole blood is strongly influenced by differences in the proportions of blood cell types between samples. For each sample, singscore [[16]](https://doi.org/10.1186/s12859-018-2435-4) was used to score marker gene sets for neutrophils, monocytes, B cells, plasmablasts, T cells, natural killer cells and eosinophils, with the marker sets fixed before analysis. Because each score uses only the sample being scored, it cannot carry information between training and test data. The cell-type scores served as a baseline model, as additional conditioning variables in the partial correlations (Section 2.7) and as adjustment covariates in the population-level tests.
+
+#### 2.4.5 Age and ancestry
+
+Age and recorded race or ancestry were tabulated by group and used both as a baseline model and as adjustment covariates. A sensitivity analysis restricted the data to the age range shared by patients and controls. The paediatric cohort ([GSE65391](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391)) was analysed separately from the adult cohorts.
 
 ### 2.5 Pathways
 
@@ -136,7 +156,7 @@ Two baselines tested the simplest explanations for any separation between IFN-lo
 
 #### 2.9.2 Expression-based comparators
 
-Four comparators used gene expression without any network structure. M1 applied an elastic net [[16]](https://doi.org/10.1111/j.1467-9868.2005.00503.x) or a random forest [[17]](https://doi.org/10.1023/A:1010933404324) to all genes, the standard approach of entering every gene into a single model. M2 fitted one model per pathway on gene expression and combined the pathway models in the same way as the LIONESS models (Section 2.10); it asked whether any gain comes from the pathways themselves rather than from the networks. M3 summarized each pathway by a single activity score (singscore [[18]](https://doi.org/10.1186/s12859-018-2435-4), mean z-score or first principal component), the classic pathway-activity approach, and also applied non-linear models, gradient boosting [[19]](https://doi.org/10.1145/2939672.2939785) and a kernel support vector machine [[20]](https://doi.org/10.1007/BF00994018), to pathway expression, which capture general interactions between genes without using network structure. M4 measured, for each pathway, how far a patient lies from the healthy centre, as the sum of squared standardized expression values or as the Mahalanobis distance, and asked whether patients simply scatter further from the healthy centre than controls do.
+Four comparators used gene expression without any network structure. M1 applied an elastic net [[17]](https://doi.org/10.1111/j.1467-9868.2005.00503.x) or a random forest [[18]](https://doi.org/10.1023/A:1010933404324) to all genes, the standard approach of entering every gene into a single model. M2 fitted one model per pathway on gene expression and combined the pathway models in the same way as the LIONESS models (Section 2.10); it asked whether any gain comes from the pathways themselves rather than from the networks. M3 summarized each pathway by a single activity score (singscore [[16]](https://doi.org/10.1186/s12859-018-2435-4), mean z-score or first principal component), the classic pathway-activity approach, and also applied non-linear models, gradient boosting [[19]](https://doi.org/10.1145/2939672.2939785) and a kernel support vector machine [[20]](https://doi.org/10.1007/BF00994018), to pathway expression, which capture general interactions between genes without using network structure. M4 measured, for each pathway, how far a patient lies from the healthy centre, as the sum of squared standardized expression values or as the Mahalanobis distance, and asked whether patients simply scatter further from the healthy centre than controls do.
 
 #### 2.9.3 Established network comparators
 
@@ -187,7 +207,7 @@ The primary hypothesis was tested by comparing L3 with a reference model, M5, th
 1. Barrett T, Wilhite SE, Ledoux P, et al. NCBI GEO: archive for functional genomics data sets—update. *Nucleic Acids Res* 2013;41(Database issue):D991–D995. PMID [23193258](https://pubmed.ncbi.nlm.nih.gov/23193258/).
 2. Masson HO, et al. XIST expression and hypermethylation of the X chromosome in males with systemic lupus erythematosus. *Front Immunol* 2026. PMID [42039161](https://pubmed.ncbi.nlm.nih.gov/42039161/).
 3. Hoffman RW, et al. Gene expression and pharmacodynamic changes in 1,760 systemic lupus erythematosus patients from two phase III trials of BAFF blockade with tabalumab. *Arthritis Rheumatol* 2017;69(3):643–654. PMID [27723281](https://pubmed.ncbi.nlm.nih.gov/27723281/).
-4. Hu Y, et al. Development of a molecular signature to monitor pharmacodynamic responses mediated by in vivo administration of glucocorticoids. *Arthritis Rheumatol* 2018. PMID [29534336](https://pubmed.ncbi.nlm.nih.gov/29534336/).
+4. Hu Y, et al. Development of a molecular signature to monitor pharmacodynamic responses mediated by in vivo administration of glucocorticoids. *Arthritis Rheumatol* 2018;70(8):1331–1342. PMID [29534336](https://pubmed.ncbi.nlm.nih.gov/29534336/).
 5. Banchereau R, et al. Personalized immunomonitoring uncovers molecular networks that stratify lupus patients. *Cell* 2016. PMID [27040498](https://pubmed.ncbi.nlm.nih.gov/27040498/).
 6. Wither JE, et al. Identification of a neutrophil-related gene expression signature that is enriched in adult systemic lupus erythematosus patients with active nephritis: clinical/pathologic associations and etiologic mechanisms. *PLoS One* 2018;13(5):e0196117. PMID [29742110](https://pubmed.ncbi.nlm.nih.gov/29742110/).
 7. López-Domínguez R, et al. Immune and molecular landscape behind non-response to mycophenolate mofetil and azathioprine in lupus nephritis therapy. *Res Sq* 2024 (preprint). PMID [38260685](https://pubmed.ncbi.nlm.nih.gov/38260685/).
@@ -199,9 +219,9 @@ The primary hypothesis was tested by comparing L3 with a reference model, M5, th
 13. Robinson MD, Oshlack A. A scaling normalization method for differential expression analysis of RNA-seq data. *Genome Biol* 2010;11(3):R25. PMID [20196867](https://pubmed.ncbi.nlm.nih.gov/20196867/).
 14. Brohawn PZ, Streicher K, Higgs BW, et al. Type I interferon gene signature test-low and -high patients with systemic lupus erythematosus have distinct gene expression signatures. *Lupus* 2019;28(13):1524–1533. PMID [31660791](https://pubmed.ncbi.nlm.nih.gov/31660791/).
 15. Gillespie M, Jassal B, Stephan R, et al. The reactome pathway knowledgebase 2022. *Nucleic Acids Res* 2022;50(D1):D687–D692. doi:[10.1093/nar/gkab1028](https://doi.org/10.1093/nar/gkab1028).
-16. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
-17. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
-18. Foroutan M, Bhuva DD, Lyu R, et al. Single sample scoring of molecular phenotypes. *BMC Bioinformatics* 2018;19(1):404. doi:[10.1186/s12859-018-2435-4](https://doi.org/10.1186/s12859-018-2435-4).
+16. Foroutan M, Bhuva DD, Lyu R, et al. Single sample scoring of molecular phenotypes. *BMC Bioinformatics* 2018;19(1):404. doi:[10.1186/s12859-018-2435-4](https://doi.org/10.1186/s12859-018-2435-4).
+17. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
+18. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
 19. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining* 2016:785–794. doi:[10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785).
 20. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
 21. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
