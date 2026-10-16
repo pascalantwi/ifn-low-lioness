@@ -226,7 +226,35 @@ The implementation was checked against direct recomputation of equation (13) for
 
 ### 2.8 Topology features
 
-[Not yet written]
+The same topology features were computed from the Pearson and the partial-correlation networks. LIONESS edges are signed, can lie outside the range $`[-1, 1]`$, and are present between every pair of genes, so each sample has a complete, weighted network for each pathway. For sample $`q`$ and a given pathway, let $`\mathbf{W}^{(q)}`$ be the $`G \times G`$ matrix of rescaled edges, with zeros on the diagonal and off-diagonal entries
+
+```math
+w_{ij}^{(q)} = \frac{e_{ij}^{(q)}}{\kappa} \qquad\qquad (15)
+```
+
+where $`\kappa`$ is the 99th percentile of $`|e_{ij}|`$ over all training samples and gene pairs of that pathway and association measure. Because the same factor $`\kappa`$ is used for every sample, the rescaling puts the edges on a common scale without removing genuine differences in edge size between samples.
+
+Five features were pre-specified for each sample and pathway. The first two are the positive and negative strength of each gene, which add up its positive and negative edges separately so that they do not cancel:
+
+```math
+s_i^{+} = \sum_{j \ne i} \max\big(w_{ij}^{(q)}, 0\big), \qquad s_i^{-} = \sum_{j \ne i} \max\big(-w_{ij}^{(q)}, 0\big) \qquad\qquad (16)
+```
+
+The third is the mean absolute edge weight, which summarizes the overall strength of the network:
+
+```math
+\bar{w}^{(q)} = \frac{2}{G(G-1)} \sum_{i < j} \big|w_{ij}^{(q)}\big| \qquad\qquad (17)
+```
+
+The fourth is the largest eigenvalue of $`\mathbf{W}^{(q)}`$, which is large when many genes are connected in a single coordinated block. The fifth is the distance between the sample's network and the reference network,
+
+```math
+D^{(q)} = \big\|\mathbf{W}^{(q)} - \mathbf{P}\big\|_F = \sqrt{\sum_{i \ne j} \big(w_{ij}^{(q)} - p_{ij}\big)^2} \qquad\qquad (18)
+```
+
+where $`\mathbf{P}`$ is the reference association matrix ($`r_{ij}`$ or $`\rho_{ij}`$, rescaled by the same $`\kappa`$ and with zeros on the diagonal) and $`\|\cdot\|_F`$ is the Frobenius norm, the square root of the sum of squared entries. By equation (8), an edge departs from its reference value through the products and squares of the sample's residuals, so $`D^{(q)}`$ grows with how far the sample lies from the reference centre and was interpreted as a measure of distance rather than of rewiring.
+
+Together these features give $`2G + 3`$ values per sample and pathway: the positive and negative strength of each of the $`G`$ genes, plus the mean absolute edge weight, the largest eigenvalue and the distance from the reference. They formed the input to the topology models (Section 2.9).
 
 ### 2.9 Baseline and comparator models
 
