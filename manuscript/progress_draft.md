@@ -1,6 +1,6 @@
 # Progress draft
 
-**Status:** skeleton only. Sections are added one at a time when instructed.
+**Status:** skeleton only. Sections are added one at a time.
 
 ## Title
 
