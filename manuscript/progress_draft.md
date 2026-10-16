@@ -56,23 +56,31 @@ Each cohort was processed separately, and no batch correction was applied across
 
 ### 2.3 IFN score and IFN-low definition
 
-Interferon (IFN) activity was measured with a score built from four interferon-stimulated genes, IFI27, IFI44, IFI44L and RSAD2. This panel is used in clinical trials of type I IFN blockade to divide patients into IFN-high and IFN-low groups [[14]](https://pubmed.ncbi.nlm.nih.gov/31660791/). To place every sample on the scale of healthy blood, the expression of each gene was standardized against the healthy controls of the training fold,
+#### 2.3.1 IFN score
 
-$$z_{gs} = \frac{x_{gs} - \bar{x}_g^{\mathrm{HC}}}{s_g^{\mathrm{HC}}}, \tag{1}$$
+Interferon (IFN) activity was measured with a score built from four interferon-stimulated genes: IFI27, IFI44, IFI44L and RSAD2. This panel is used in clinical trials of type I IFN blockade to divide patients into IFN-high and IFN-low groups [[14]](https://pubmed.ncbi.nlm.nih.gov/31660791/). To place every sample on the scale of healthy blood, the expression of each gene was first standardized against the healthy controls (HC) of the training fold:
 
-where $x_{gs}$ is the expression of gene $g$ in sample $s$, and $\bar{x}_g^{\mathrm{HC}}$ and $s_g^{\mathrm{HC}}$ are the mean and SD of that gene among the training-fold controls. The IFN score of a sample was then the mean of its four standardized values,
+$$z_{gs} = \frac{x_{gs} - \bar{x}_g^{\mathrm{HC}}}{s_g^{\mathrm{HC}}} \tag{1}$$
 
-$$S_s = \frac{1}{4} \sum_{g \in \mathcal{G}_{\mathrm{IFN}}} z_{gs}, \qquad \mathcal{G}_{\mathrm{IFN}} = \{\mathrm{IFI27}, \mathrm{IFI44}, \mathrm{IFI44L}, \mathrm{RSAD2}\}. \tag{2}$$
+Here, $x_{gs}$ is the expression of gene $g$ in sample $s$, and $\bar{x}_g^{\mathrm{HC}}$ and $s_g^{\mathrm{HC}}$ are the mean and standard deviation (SD) of that gene among the training-fold controls. The IFN score of a sample is the mean of its four standardized values:
 
-Samples were classified as IFN-low when their score lay within two SD above the control mean,
+$$S_s = \frac{1}{4} \sum_{g \in \mathcal{G}_{\mathrm{IFN}}} z_{gs}, \qquad \mathcal{G}_{\mathrm{IFN}} = \{\mathrm{IFI27},\ \mathrm{IFI44},\ \mathrm{IFI44L},\ \mathrm{RSAD2}\} \tag{2}$$
 
-$$S_s \le c, \qquad c = \bar{S}^{\mathrm{HC}} + 2\, s_S^{\mathrm{HC}}, \tag{3}$$
+#### 2.3.2 IFN-low cutoff
 
-where $\bar{S}^{\mathrm{HC}}$ and $s_S^{\mathrm{HC}}$ are the mean and SD of the score among the training-fold controls. Because the cutoff $c$ depends on the data, it was estimated within each training fold and then applied, without change, to the test samples of that fold. Controls were filtered by the same rule, which removed about 2.5% of them, so that patients and controls entered the analysis on an equal footing. A stricter cutoff, $c = \bar{S}^{\mathrm{HC}} + s_S^{\mathrm{HC}}$, was examined in a sensitivity analysis.
+A sample was classified as IFN-low when its score lay no more than two SD above the control mean:
 
-No cutoff can make IFN-low patients identical to controls in IFN activity, since patients who fall just below it may still carry a mildly raised signature. For this reason, the residual IFN score was kept as a baseline model that every other model had to outperform (Section 2.9). To stop the network features from simply re-measuring IFN activity, the four score genes and all genes in the Reactome *Interferon Signaling* subtree (R-HSA-913531) [[15]](https://doi.org/10.1093/nar/gkab1028) were removed from them; a sensitivity analysis restored the subtree.
+$$S_s \le c, \qquad c = \bar{S}^{\mathrm{HC}} + 2\, s_S^{\mathrm{HC}} \tag{3}$$
 
-Treatment may also shape IFN status. Hydroxychloroquine and immunosuppressants can lower the IFN signature, so some patients classified as IFN-low may be IFN-high patients whose signature has been suppressed. In the cohorts with medication records ([GSE224705](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224705), [GSE65391](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391) and [GSE110169](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE110169)), we therefore compared the proportion of IFN-low patients between treated and untreated patients, and in GSE65391 we described how individual patients moved between IFN states across visits.
+Here, $\bar{S}^{\mathrm{HC}}$ and $s_S^{\mathrm{HC}}$ are the mean and SD of the score among the training-fold controls. Because the cutoff $c$ depends on the data, it was estimated within each training fold and then applied, without change, to the test samples of that fold. Controls were filtered by the same rule, which removed about 2.5% of them, so that patients and controls entered the analysis on an equal footing. A stricter cutoff, $c = \bar{S}^{\mathrm{HC}} + s_S^{\mathrm{HC}}$, was examined in a sensitivity analysis.
+
+#### 2.3.3 Residual IFN signal
+
+No cutoff can make IFN-low patients identical to controls in IFN activity, since patients who fall just below it may still carry a mildly raised signature. The residual IFN score was therefore kept as a baseline model that every other model had to outperform (Section 2.9). To stop the network features from simply re-measuring IFN activity, the four score genes and all genes in the Reactome *Interferon Signaling* subtree (R-HSA-913531) [[15]](https://doi.org/10.1093/nar/gkab1028) were removed from them; a sensitivity analysis restored the subtree.
+
+#### 2.3.4 Treatment and IFN status
+
+Hydroxychloroquine and immunosuppressants can lower the IFN signature, so some patients classified as IFN-low may be IFN-high patients whose signature has been suppressed by treatment. In the cohorts with medication records ([GSE224705](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224705), [GSE65391](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391) and [GSE110169](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE110169)), the proportion of IFN-low patients was compared between treated and untreated patients. In GSE65391, which follows patients over time, we also described how individual patients moved between IFN states across visits.
 
 ### 2.4 Confounding control
 
