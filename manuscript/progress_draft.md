@@ -206,7 +206,25 @@ The approximations were used only for interpretation and for the design of basel
 
 ### 2.7 LIONESS partial-correlation estimation
 
-[Not yet written]
+Every sample, whether patient or control and whether in a training or a test fold, was given a network by exactly the same rule. Section 2.6 showed that the composition of the reference determines what the edges respond to: when the reference contains more samples of one group, differences in mean expression also enter the edges, whereas with equal numbers of the two groups the edges mainly reflect how the genes co-vary. Class-balanced references were therefore used. Within each training fold, $`B = 20`$ reference subsets $`R_1, \ldots, R_B`$ were formed, each containing all training samples of the smaller class and an equal-sized random sample of the larger class.
+
+For a sample $`q`$ and a reference subset $`R_b`$, let $`R = R_b \setminus \{q\}`$ be that subset with sample $`q`$ removed if it was a member. The edge between genes $`i`$ and $`j`$ was
+
+```math
+e_{ij}^{(q,b)} = \big(|R| + 1\big)\,\rho_{ij}\big(R \cup \{q\}\big) - |R|\,\rho_{ij}(R) \qquad\qquad (12)
+```
+
+where $`|R|`$ is the number of samples in $`R`$ and $`\rho_{ij}(\cdot)`$ is the partial correlation of equation (5) estimated from the samples shown. When sample $`q`$ belongs to $`R_b`$, equation (12) is the leave-one-out form of LIONESS in equation (6); when it does not, as for every test sample, it is the add-one-in form. The final edge was the average over the $`B`$ subsets,
+
+```math
+e_{ij}^{(q)} = \frac{1}{B} \sum_{b=1}^{B} e_{ij}^{(q,b)} \qquad\qquad (13)
+```
+
+which reduces the variation that comes from the random choice of each reference subset.
+
+Partial correlations were computed from the shrinkage covariance of equation (4), which shrinks the covariances but leaves the variances unchanged. The shrinkage intensity $`\lambda`$ was chosen in the inner cross-validation from 0.5, 1 and 2 times the analytic estimate of Schäfer and Strimmer [[19]](https://pubmed.ncbi.nlm.nih.gov/16646851/), and was then held fixed within the fold. Because each pathway contains at most 50 genes, the covariance matrix could be inverted directly. In the primary analysis, the cell-composition scores of Section 2.4 were added to the set of variables on which each partial correlation was conditioned, so that the edges describe co-expression beyond what is explained by differences in blood cell proportions; a sensitivity analysis conditioned on the pathway genes only.
+
+Pearson LIONESS (model L2-P) used the same reference design, with Pearson correlation in place of partial correlation. The implementation was checked against direct recomputation of equation (12), against the `pcor.shrink` function of the R package corpcor at a fixed $`\lambda`$ [[19]](https://pubmed.ncbi.nlm.nih.gov/16646851/), and, for the Pearson version, against the lionessR package [[25]](https://pubmed.ncbi.nlm.nih.gov/31653243/), which implements the original LIONESS method [[20]](https://pubmed.ncbi.nlm.nih.gov/30981959/).
 
 ### 2.8 Topology features
 
@@ -288,11 +306,12 @@ The approximations were used only for interpretation and for the design of basel
 22. Ahn S, Grimes T, Datta S. A pseudo-value regression approach for differential network analysis of co-expression data. *BMC Bioinformatics* 2023;24(1):8. PMID [36624383](https://pubmed.ncbi.nlm.nih.gov/36624383/).
 23. Liu X, et al. Personalized characterization of diseases using sample-specific networks. *Nucleic Acids Res* 2016. PMID [27596597](https://pubmed.ncbi.nlm.nih.gov/27596597/).
 24. Huang Y, et al. Disease characterization using a partial correlation-based sample-specific network. *Brief Bioinform* 2021. PMID [32422654](https://pubmed.ncbi.nlm.nih.gov/32422654/).
-25. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
-26. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
-27. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining* 2016:785–794. doi:[10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785).
-28. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
-29. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
+25. Kuijjer ML, et al. lionessR: single sample network inference in R. *BMC Cancer* 2019. PMID [31653243](https://pubmed.ncbi.nlm.nih.gov/31653243/).
+26. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
+27. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
+28. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining* 2016:785–794. doi:[10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785).
+29. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
+30. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
 
 ## Supplementary material
 
