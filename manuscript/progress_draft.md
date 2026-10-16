@@ -56,7 +56,23 @@ Each cohort was processed separately, and no batch correction was applied across
 
 ### 2.3 IFN score and IFN-low definition
 
-[Not yet written]
+The interferon (IFN) status of each sample was summarized by an IFN score based on four interferon-stimulated genes, IFI27, IFI44, IFI44L and RSAD2, the panel used to stratify patients in clinical trials of type I IFN blockade [[14]](https://pubmed.ncbi.nlm.nih.gov/31660791/). Each gene was first standardized using the mean and SD of the healthy controls in the training fold,
+
+$$z_{gs} = \frac{x_{gs} - \bar{x}_g^{\mathrm{HC}}}{s_g^{\mathrm{HC}}},$$
+
+where $x_{gs}$ is the expression of gene $g$ in sample $s$, and $\bar{x}_g^{\mathrm{HC}}$ and $s_g^{\mathrm{HC}}$ are the mean and SD of gene $g$ among the training-fold controls. The IFN score of sample $s$ was the average of these four standardized values,
+
+$$S_s = \frac{1}{4} \sum_{g \in \mathcal{G}_{\mathrm{IFN}}} z_{gs}, \qquad \mathcal{G}_{\mathrm{IFN}} = \{\mathrm{IFI27}, \mathrm{IFI44}, \mathrm{IFI44L}, \mathrm{RSAD2}\}.$$
+
+A sample was classified as IFN-low if its score did not exceed the control mean by more than two SD,
+
+$$S_s \le c, \qquad c = \bar{S}^{\mathrm{HC}} + 2\, s_S^{\mathrm{HC}},$$
+
+where $\bar{S}^{\mathrm{HC}}$ and $s_S^{\mathrm{HC}}$ are the mean and SD of the IFN score among the training-fold controls. The cutoff $c$ was computed inside each training fold and applied unchanged to the test samples of that fold. The same rule was applied to controls, which removed about 2.5% of them, so that patients and controls met the same criterion. A stricter cutoff, $c = \bar{S}^{\mathrm{HC}} + s_S^{\mathrm{HC}}$, was used as a sensitivity analysis.
+
+A cutoff cannot make the two groups identical in IFN activity, because patients just below it may still have mildly raised IFN activity. The residual IFN score was therefore treated as a baseline that every model had to outperform (Section 2.9). In addition, the four IFN-score genes and all genes in the Reactome *Interferon Signaling* subtree (R-HSA-913531) [[15]](https://doi.org/10.1093/nar/gkab1028) were excluded from the network features, and a sensitivity analysis included the subtree.
+
+Hydroxychloroquine and immunosuppressants may lower the IFN signature, so some IFN-low patients could be IFN-high patients whose signature has been suppressed by treatment. In cohorts with medication data ([GSE224705](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224705), [GSE65391](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391) and [GSE110169](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE110169)), the proportion of IFN-low patients was compared between treated and untreated patients, and in GSE65391 the transitions of each patient between IFN states across visits were described.
 
 ### 2.4 Confounding control
 
@@ -154,6 +170,8 @@ All models below are fitted inside the training folds only, use the same cross-v
 11. Robinson MD, McCarthy DJ, Smyth GK. edgeR: a Bioconductor package for differential expression analysis of digital gene expression data. *Bioinformatics* 2010;26(1):139–140. PMID [19910308](https://pubmed.ncbi.nlm.nih.gov/19910308/).
 12. Robinson MD, Oshlack A. A scaling normalization method for differential expression analysis of RNA-seq data. *Genome Biol* 2010;11(3):R25. PMID [20196867](https://pubmed.ncbi.nlm.nih.gov/20196867/).
 13. Chen Y, Lun ATL, Smyth GK. From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline. *F1000Res* 2016;5:1438. PMID [27508061](https://pubmed.ncbi.nlm.nih.gov/27508061/).
+14. Brohawn PZ, et al. Type I interferon gene signature test-low and -high patients with systemic lupus erythematosus have distinct gene expression signatures. *Lupus* 2019. PMID [31660791](https://pubmed.ncbi.nlm.nih.gov/31660791/).
+15. Gillespie M, Jassal B, Stephan R, et al. The reactome pathway knowledgebase 2022. *Nucleic Acids Res* 2022;50(D1):D687–D692. doi:[10.1093/nar/gkab1028](https://doi.org/10.1093/nar/gkab1028).
 
 ## Supplementary material
 
