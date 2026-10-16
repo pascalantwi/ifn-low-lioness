@@ -40,7 +40,26 @@
 
 ### 2.1 Data sources and cohort eligibility
 
-[Not yet written]
+**Cohorts.** We used public whole-blood gene-expression cohorts of systemic lupus erythematosus (SLE) that include healthy controls (HC) or a comparison disease (Table 1). The candidate primary cohorts were GSE319130 (RNA sequencing; 720 SLE patients and 84 HC, of whom 679 and 77 were female) [V1] and GSE88884 (Affymetrix Human Transcriptome Array 2.0; baseline samples from 1,760 SLE patients in the ILLUMINATE trials and 60 HC) [V2]. Four further cohorts were used for specific comparisons: GSE110169 (82 SLE, 84 rheumatoid arthritis (RA) and 77 HC processed together, with recorded glucocorticoid use) [V3]; GSE65391 (158 children with SLE seen at repeated visits, with disease-activity scores, and 46 HC) [V4]; GSE99967 (SLE with and without lupus nephritis (LN), and HC) [V5]; and GSE224705 (SLE with recorded prednisone dose) [V6]. The PRECISESADS cohort (seven systemic autoimmune diseases and controls; controlled access) [V7] will be added if access is granted.
+
+**Exclusions.** Series that repeat samples from other series were excluded: GSE72326 duplicates GSE49454 [V8], and GSE45291, GSE121239 and GSE224705 share patients and controls [V9], so at most one of these was used in any analysis. One sample was used per patient (the first visit in longitudinal cohorts), and technical replicates were averaged.
+
+**Feasibility (go/no-go) check.** Before registration, and before fitting any model to the outcome, we counted IFN-low patients and controls by inferred sex (Section 2.4) and tabulated batch, age, ancestry and medication by group. A cohort qualified as a **primary cohort** if it had at least 80 female IFN-low patients and 60 female controls, and if batch was not confounded with group (patients and controls not processed in separate batches). These numbers give a 95% confidence interval half-width of about ±0.085 for an AUC of 0.70 (Hanley–McNeil method) [V10]. Cohorts with at least 25 patients per group (half-width about ±0.15) qualified as **replication cohorts** and were reported descriptively.
+
+**Links to verify before this section is final**
+
+| Tag | What to check | Link |
+|---|---|---|
+| V1 | GSE319130: platform, 720 SLE / 84 HC, 679 / 77 female, whole blood | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE319130 |
+| V2 | GSE88884: HTA 2.0, 1,760 SLE baseline, 60 HC, ILLUMINATE trials | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE88884 |
+| V3 | GSE110169: 82 SLE / 84 RA / 77 HC, glucocorticoid use recorded | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE110169 |
+| V4 | GSE65391: 158 paediatric SLE, repeated visits, 46 HC, SLEDAI recorded | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391 |
+| V5 | GSE99967: numbers of LN, non-LN SLE and HC; whole blood or not *(unverified)* | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE99967 |
+| V6 | GSE224705: prednisone dose recorded; sample counts | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224705 |
+| V7 | PRECISESADS: access route (ELIXIR Luxembourg) and data type | https://www.precisesads.eu/ |
+| V8 | GSE72326 duplicates GSE49454 (compare sample titles) | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE72326 and https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE49454 |
+| V9 | GSE45291, GSE121239 and GSE224705 share patients (compare sample titles) | https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE45291, https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE121239 |
+| V10 | Hanley–McNeil half-widths: recomputed, ±0.086 (80 vs 60) and ±0.146 (25 vs 25) | Checked; cite Hanley & McNeil (1982) |
 
 ### 2.2 Pre-processing and harmonization
 
