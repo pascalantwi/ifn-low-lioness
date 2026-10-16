@@ -27,12 +27,12 @@ for q in range(40):
     approx=np.outer(z,z)+R*(1-(z[:,None]**2+z[None,:]**2)/2)
     errs.append(np.abs(e-approx)[iu].max())
 print(f"pearson: max|exact-approx|={max(errs):.3g}")
-# expectation checks with first-order formula (lam=0): spread invariance; balanced mean shift
-P,O=pcor_from(cov(X)); sq=np.sqrt(np.diag(O))
+# expectation checks with the first-order formula (lam=0), using population parameters
+Opop=A; sq=np.sqrt(np.diag(Opop)); rho=-Opop[0,1]/(sq[0]*sq[1])
 def edges(D):
-    U=(D@O)/sq; return U[:,0]*U[:,1]+P[0,1]*(1+(U[:,0]**2+U[:,1]**2)/2)
-Z=rng.multivariate_normal(np.zeros(G),Sig,size=200000)
-print("rho01=%.4f  E[e] k=1: %.4f  k=2: %.4f"%(P[0,1],edges(Z).mean(),edges(2*Z).mean()))
+    U=(D@Opop)/sq; return U[:,0]*U[:,1]+rho*(1+(U[:,0]**2+U[:,1]**2)/2)
+Z=rng.multivariate_normal(np.zeros(G),Sig,size=400000)
+print("spread: rho=%.4f  E[e] k=1: %.4f  k=2: %.4f"%(rho,edges(Z).mean(),edges(2*Z).mean()))
 delta=np.full(G,0.8)
 print("balanced shift: E[e|+d/2]=%.4f  E[e|-d/2]=%.4f"%(edges(Z+delta/2).mean(),edges(Z-delta/2).mean()))
-print("unbalanced (ref mean at group B): E[e|A]=%.4f E[e|B]=%.4f"%(edges(Z+delta).mean(),edges(Z).mean()))
+print("unbalanced (ref mean at group B): E[e|A]=%.4f  E[e|B]=%.4f"%(edges(Z+delta).mean(),edges(Z).mean()))
