@@ -126,55 +126,83 @@ Gene sets were taken from the Molecular Signatures Database (MSigDB) [[17]](http
 
 For the comparisons involving IFN-low patients, pathways were drawn from the Reactome *Immune System* subtree (R-HSA-168256), excluding the *Interferon alpha/beta signaling* pathway in line with Section 2.3. Partial correlations become unstable as the number of genes approaches the number of samples, so each network was limited to between 15 and 50 genes after filtering. This keeps the number of genes well below the smallest training set expected in a primary cohort, about 110 samples per fold (80% of 80 IFN-low patients and 60 controls). Pathways with more than 50 genes, including REACTOME_INTERFERON_SIGNALING, were replaced by their Reactome sub-pathways; sub-pathways that still exceeded 50 genes were restricted to the 50 genes with the highest variance in the training fold, and pathways with fewer than 15 genes were removed. Near-duplicate pathways, defined as pairs with a Jaccard index of gene overlap above 0.8, were reduced to a single representative. A secondary analysis used all Reactome pathways that met the same size criteria. All gene lists were archived with the analysis code.
 
-### 2.6 Theory
+### 2.6 Theory: what single-sample networks contain
 
-The aim of this section is to show, in a simple formula, what a LIONESS edge actually measures. This tells us how to interpret the network features and which baseline models they must be compared with.
+This section derives a simple formula for what a LIONESS edge measures. The formula explains how the network features should be interpreted and which baseline models they must be compared with.
 
-Consider one pathway with $`G`$ genes and a reference set of $`N`$ samples. The co-expression of the genes is summarized by their covariance matrix $`\mathbf{S}`$. Because $`G`$ can be large relative to $`N`$, the covariance matrix was stabilized by shrinkage [[19]](https://pubmed.ncbi.nlm.nih.gov/16646851/):
+**Set-up.** Consider a pathway with $`G`$ genes and a reference set of $`N`$ samples. Let $`\mathbf{x}_q`$ be the expression vector of sample $`q`$, $`\boldsymbol{\mu}`$ the reference mean and $`\mathbf{d} = \mathbf{x}_q - \boldsymbol{\mu}`$ the deviation of sample $`q`$ from that mean. Let $`\mathbf{S}`$ be the reference covariance matrix (with divisor $`N`$). Because $`G`$ can be large relative to $`N`$, the covariance matrix was stabilized by shrinkage with a fixed intensity $`\lambda \in [0, 1]`$ [[19]](https://pubmed.ncbi.nlm.nih.gov/16646851/):
 
 ```math
 \boldsymbol{\Sigma}_\lambda = (1-\lambda)\,\mathbf{S} + \lambda\,\mathrm{diag}(\mathbf{S}) \qquad\qquad (4)
 ```
 
-Here, $`\mathrm{diag}(\mathbf{S})`$ keeps only the variances of the genes and sets all covariances to zero, and $`\lambda`$, between 0 and 1, sets how strongly the covariances are pulled towards zero. The partial correlation between genes $`i`$ and $`j`$, which measures their association after removing the effect of all other genes in the pathway, is obtained from the inverse of this matrix, $`\boldsymbol{\Omega} = \boldsymbol{\Sigma}_\lambda^{-1}`$:
+where $`\mathrm{diag}(\mathbf{S})`$ keeps the variances of the genes and sets their covariances to zero. Let $`\boldsymbol{\Omega} = \boldsymbol{\Sigma}_\lambda^{-1}`$ be the precision matrix. The partial correlation between genes $`i`$ and $`j`$, that is, their association after removing the effect of the other genes in the pathway, is
 
 ```math
 \rho_{ij} = -\frac{\Omega_{ij}}{\sqrt{\Omega_{ii}\,\Omega_{jj}}} \qquad\qquad (5)
 ```
 
-LIONESS builds a network for each sample $`q`$ by comparing the partial correlation estimated from all $`N`$ samples with the one estimated after leaving sample $`q`$ out, $`\rho_{ij}^{(-q)}`$ [[20]](https://pubmed.ncbi.nlm.nih.gov/30981959/):
+The LIONESS edge for sample $`q`$ is [[20]](https://pubmed.ncbi.nlm.nih.gov/30981959/)
 
 ```math
 e_{ij}^{(q)} = N\,\rho_{ij} - (N-1)\,\rho_{ij}^{(-q)} \qquad\qquad (6)
 ```
 
-In words, the edge $`e_{ij}^{(q)}`$ measures how much sample $`q`$ changes the association between genes $`i`$ and $`j`$, scaled so that the edges average to $`\rho_{ij}`$ across the samples. This formula is the same as the jackknife pseudo-value of classical statistics [[21]](https://scholar.google.com/scholar?q=Tukey+1958+Bias+and+confidence+in+not-quite+large+samples), which has already been used for differential network analysis [[22]](https://pubmed.ncbi.nlm.nih.gov/36624383/).
+where $`\rho_{ij}^{(-q)}`$ is computed without sample $`q`$. The edge therefore measures how much sample $`q`$ changes the association between the two genes. Equation (6) has the same form as the jackknife pseudo-value of classical statistics [[21]](https://scholar.google.com/scholar?q=Tukey+1958+Bias+and+confidence+in+not-quite+large+samples), which has already been used for differential network analysis [[22]](https://pubmed.ncbi.nlm.nih.gov/36624383/).
 
-To see what the edge depends on, let $`\mathbf{d} = \mathbf{x}_q - \boldsymbol{\mu}`$ be the deviation of sample $`q`$ from the reference mean, and define for each gene
-
-```math
-\tilde{u}_i = \frac{(\boldsymbol{\Omega}\,\mathbf{d})_i}{\sqrt{\Omega_{ii}}} \qquad\qquad (7)
-```
-
-The quantity $`\tilde{u}_i`$ is a standardized residual: it measures how far gene $`i`$ in sample $`q`$ is from the value predicted by the other genes of the pathway, in units of standard deviations. When the reference set is large, and without shrinkage ($`\lambda = 0`$), equation (6) is very closely approximated by
+**Conditional residuals.** Let $`\mathbf{u} = \boldsymbol{\Omega}\mathbf{d}`$ and
 
 ```math
-e_{ij}^{(q)} \approx \underbrace{\tilde{u}_i\,\tilde{u}_j}_{\text{product term}} \;+\; \rho_{ij}\Big(1 + \underbrace{\tfrac{1}{2}\big(\tilde{u}_i^2 + \tilde{u}_j^2\big)}_{\text{squared term}}\Big) \qquad\qquad (8)
+\tilde{u}_i = \frac{u_i}{\sqrt{\Omega_{ii}}} \qquad\qquad (7)
 ```
 
-Equation (8) says that an edge is built from only two ingredients: the product of the two genes' residuals, which is positive when both genes deviate in the same direction, and the squares of the residuals, which grow when the sample is unusual for either gene. With shrinkage, the edge is still made of products and squares of the sample's deviations; only the weights of the terms change. Our numerical checks on simulated data confirmed that equation (8) agrees closely with the exact LIONESS edge.
+Up to scaling, $`\tilde{u}_i`$ is the residual of gene $`i`$ in sample $`q`$ after regression on the other genes of the pathway, divided by its standard deviation; it measures how unexpected the value of gene $`i`$ is, given the other genes. Across the reference population, each $`\tilde{u}_i`$ has variance 1, and two residuals have covariance $`-\rho_{ij}`$: when two genes are positively partially correlated, their residuals are negatively correlated.
 
-A related method, the sample-specific network (SSN), defines an edge as the change in the association when sample $`q`$ is added to a reference set $`R`$ of $`n`$ samples [[23]](https://pubmed.ncbi.nlm.nih.gov/27596597/). Writing $`c_{ij}(R)`$ for the association in the reference set, the two methods are linked exactly by
+**Result 1 (no shrinkage, $`\lambda = 0`$).** To first order in $`1/(N-1)`$,
 
 ```math
-\text{SSN edge} = \frac{e_{ij}^{(q)} - c_{ij}(R)}{n+1} \qquad\qquad (9)
+e_{ij}^{(q)} \approx \tilde{u}_i\,\tilde{u}_j + \rho_{ij}\left(1 + \frac{\tilde{u}_i^2 + \tilde{u}_j^2}{2}\right) \qquad\qquad (8)
 ```
 
-so, edge by edge, SSN is a rescaled version of LIONESS with the same reference.
+An edge is therefore built from two ingredients: the product of the two genes' residuals, which is positive when both genes deviate in the same direction, and the squares of the residuals, which grow when the sample is unusual for either gene. Averaged over the reference population, the edge equals $`\rho_{ij}`$, as LIONESS requires.
 
-Equation (8) leads to four predictions that guided the design of the study. First, an edge is calculated only from the sample's own expression values in the pathway, so a network cannot contain information that is not already in those values; it can only present the information in a different form. This is why the network models were compared with models built directly on pathway expression (Section 2.9). Second, because the edge is built from products and squares, changing the sign of a deviation does not change the edge. As a result, when the reference contains equal numbers of patients and controls, a group that differs only in its average expression, or only in how widely its values are spread, produces the same average edges as the other group. Network edges are therefore expected to separate groups mainly when the genes co-vary differently, and our pilot simulation confirmed this. Third, node strength, the sum of a gene's edges, is driven by the same residuals and is therefore closely related to how far a sample lies from the healthy centre, which is the distance-from-health baseline (M4, Section 2.9). Fourth, by equation (9), any difference in performance between SSN and LIONESS must come from the network summaries or the choice of reference, not from the edges themselves.
+**Result 2 (with shrinkage).** When $`\lambda`$ is fixed, $`\boldsymbol{\Sigma}_\lambda`$ is a linear function of $`\mathbf{S}`$, and the same expansion gives
 
-Equation (8) was used only to interpret the results and to choose the baselines. All network features were computed with exact LIONESS (Section 2.7).
+```math
+e_{ij}^{(q)} \approx \rho_{ij} + \tilde{M}_{ij} + \rho_{ij}\,\frac{\tilde{M}_{ii} + \tilde{M}_{jj}}{2}, \qquad \mathbf{M} = (1-\lambda)\,\mathbf{u}\mathbf{u}^{\top} + \lambda\,\boldsymbol{\Omega}\mathbf{D}_d\boldsymbol{\Omega} \qquad\qquad (9)
+```
+
+where $`\mathbf{D}_d = \mathrm{diag}(d_1^2, \ldots, d_G^2)`$ and $`\tilde{M}_{ij} = M_{ij} / \sqrt{\Omega_{ii}\,\Omega_{jj}}`$. The matrix $`\mathbf{M}`$ mixes the products of residuals, $`\mathbf{u}\mathbf{u}^{\top}`$, with a term built from the squared deviations of the individual genes, in proportions set by $`\lambda`$. Equation (9) reduces to equation (8) when $`\lambda = 0`$, and with shrinkage the edge is still made only of products and squares of the sample's deviations.
+
+**Pearson analogue.** For Pearson correlation $`r_{ij}`$ and standardized expression values $`z_i`$, the same expansion gives
+
+```math
+e_{ij}^{(q)} \approx z_i\,z_j + r_{ij}\left(1 - \frac{z_i^2 + z_j^2}{2}\right) \qquad\qquad (10)
+```
+
+**Result 3 (SSN is an exact rescaling of LIONESS).** The sample-specific network (SSN) method defines an edge as the change in an association measure $`c`$ when sample $`q`$ is added to a reference set $`R`$ of $`n`$ samples, $`\Delta_{ij}^{(q)} = c_{ij}(R \cup \{q\}) - c_{ij}(R)`$ [[23]](https://pubmed.ncbi.nlm.nih.gov/27596597/). LIONESS with the same reference gives $`e_{ij}^{(q)} = (n+1)\,c_{ij}(R \cup \{q\}) - n\,c_{ij}(R)`$, so
+
+```math
+\Delta_{ij}^{(q)} = \frac{e_{ij}^{(q)} - c_{ij}(R)}{n+1} \qquad\qquad (11)
+```
+
+exactly, for any association measure. Equations (8)–(10) therefore also describe SSN and its partial-correlation version, P-SSN [[24]](https://pubmed.ncbi.nlm.nih.gov/32422654/). Numerical checks on simulated data confirmed that equations (8)–(10) agree closely with exact LIONESS and that equation (11) holds exactly; the check code is provided with the analysis code.
+
+**Predictions.** Equations (8)–(11) lead to six predictions.
+
+*P1 (no new information).* Each edge is a fixed function of $`\mathbf{d}`$, so a network contains no information beyond the sample's own expression values within the pathway; it can only represent that information differently. Network models must therefore be compared with models built directly on pathway expression (Section 2.9).
+
+*P2 (quadratic classifier).* A linear model on a pathway's edges is a quadratic function of $`\mathbf{d}`$, so its natural competitor is a quadratic classifier on the pathway's expression values, such as regularized quadratic discriminant analysis.
+
+*P3 (mean and spread).* Because each edge is built from products and squares, changing the sign of a deviation does not change the edge. As a result, a group that differs from the other only in how widely its values are spread produces the same average edges, and, when the reference contains equal numbers of the two groups, so does a group that differs only in its mean expression. Edges are therefore expected to separate groups mainly when the genes co-vary differently. The pilot simulation confirmed this prediction.
+
+*P4 (opposite signs).* The squared terms carry a positive sign for partial correlation (equation 8) and a negative sign for Pearson correlation (equation 10), so unusual samples strengthen partial-correlation edges but weaken Pearson edges. Partial-correlation and Pearson LIONESS (models L2 and L2-P) can therefore behave differently on the same data.
+
+*P5 (node strength).* Node strength, the sum of a gene's edges, is approximately $`\tilde{u}_i \sum_{j \ne i} \tilde{u}_j`$ plus squared terms, and is therefore closely related to how far a sample lies from the healthy centre, the distance-from-health baseline (M4).
+
+*P6 (equivalence).* By equation (11), SSN, P-SSN and LIONESS differ edge by edge only by a fixed rescaling, so any difference in their performance must come from the network summaries or the choice of reference.
+
+The approximations were used only for interpretation and for the design of baselines. All network features were computed with exact LIONESS (Section 2.7), and the agreement between exact and first-order edges on the real data, including in the tails of the distribution, is reported.
 
 ### 2.7 LIONESS partial-correlation estimation
 
@@ -194,11 +222,11 @@ Two baselines tested the simplest explanations for any separation between IFN-lo
 
 #### 2.9.2 Expression-based comparators
 
-Four comparators used gene expression without any network structure. M1 applied an elastic net [[24]](https://doi.org/10.1111/j.1467-9868.2005.00503.x) or a random forest [[25]](https://doi.org/10.1023/A:1010933404324) to all genes, the standard approach of entering every gene into a single model. M2 fitted one model per pathway on gene expression and combined the pathway models in the same way as the LIONESS models (Section 2.10); it asked whether any gain comes from the pathways themselves rather than from the networks. M3 summarized each pathway by a single activity score (singscore [[16]](https://doi.org/10.1186/s12859-018-2435-4), mean z-score or first principal component), the classic pathway-activity approach, and also applied non-linear models, gradient boosting [[26]](https://doi.org/10.1145/2939672.2939785) and a kernel support vector machine [[27]](https://doi.org/10.1007/BF00994018), to pathway expression, which capture general interactions between genes without using network structure. M4 measured, for each pathway, how far a patient lies from the healthy centre, as the sum of squared standardized expression values or as the Mahalanobis distance, and asked whether patients simply scatter further from the healthy centre than controls do.
+Four comparators used gene expression without any network structure. M1 applied an elastic net [[25]](https://doi.org/10.1111/j.1467-9868.2005.00503.x) or a random forest [[26]](https://doi.org/10.1023/A:1010933404324) to all genes, the standard approach of entering every gene into a single model. M2 fitted one model per pathway on gene expression and combined the pathway models in the same way as the LIONESS models (Section 2.10); it asked whether any gain comes from the pathways themselves rather than from the networks. M3 summarized each pathway by a single activity score (singscore [[16]](https://doi.org/10.1186/s12859-018-2435-4), mean z-score or first principal component), the classic pathway-activity approach, and also applied non-linear models, gradient boosting [[27]](https://doi.org/10.1145/2939672.2939785) and a kernel support vector machine [[28]](https://doi.org/10.1007/BF00994018), to pathway expression, which capture general interactions between genes without using network structure. M4 measured, for each pathway, how far a patient lies from the healthy centre, as the sum of squared standardized expression values or as the Mahalanobis distance, and asked whether patients simply scatter further from the healthy centre than controls do.
 
 #### 2.9.3 Established network comparators
 
-Two comparators represented network methods already used in lupus research. W1 reproduced a typical published weighted gene co-expression network analysis (WGCNA) [[28]](https://pubmed.ncbi.nlm.nih.gov/19114008/) and hub-gene pipeline, with every step fitted within the training folds to avoid data leakage. W2 used WGCNA module eigengenes, the summary scores of gene modules, estimated only from training data; W2 was the main established-network comparator.
+Two comparators represented network methods already used in lupus research. W1 reproduced a typical published weighted gene co-expression network analysis (WGCNA) [[29]](https://pubmed.ncbi.nlm.nih.gov/19114008/) and hub-gene pipeline, with every step fitted within the training folds to avoid data leakage. W2 used WGCNA module eigengenes, the summary scores of gene modules, estimated only from training data; W2 was the main established-network comparator.
 
 #### 2.9.4 LIONESS models
 
@@ -265,11 +293,12 @@ The primary hypothesis was tested by comparing L3 with a reference model, M5, th
 21. Tukey JW. Bias and confidence in not-quite large samples (abstract). *Ann Math Stat* 1958;29(2):614.
 22. Ahn S, Grimes T, Datta S. A pseudo-value regression approach for differential network analysis of co-expression data. *BMC Bioinformatics* 2023;24(1):8. PMID [36624383](https://pubmed.ncbi.nlm.nih.gov/36624383/).
 23. Liu X, et al. Personalized characterization of diseases using sample-specific networks. *Nucleic Acids Res* 2016. PMID [27596597](https://pubmed.ncbi.nlm.nih.gov/27596597/).
-24. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
-25. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
-26. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining* 2016:785–794. doi:[10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785).
-27. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
-28. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
+24. Huang Y, et al. Disease characterization using a partial correlation-based sample-specific network. *Brief Bioinform* 2021. PMID [32422654](https://pubmed.ncbi.nlm.nih.gov/32422654/).
+25. Zou H, Hastie T. Regularization and variable selection via the elastic net. *J R Stat Soc Series B Stat Methodol* 2005;67(2):301–320. doi:[10.1111/j.1467-9868.2005.00503.x](https://doi.org/10.1111/j.1467-9868.2005.00503.x).
+26. Breiman L. Random forests. *Mach Learn* 2001;45:5–32. doi:[10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
+27. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining* 2016:785–794. doi:[10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785).
+28. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
+29. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
 
 ## Supplementary material
 
