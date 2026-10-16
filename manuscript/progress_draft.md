@@ -214,27 +214,21 @@ The approximations were used only for interpretation and for the design of basel
 
 ### 2.9 Baseline and comparator models
 
-All models were fitted within the training folds only, used the same cross-validation splits and were scored in the same way, so that any difference in performance reflects the features rather than the set-up. The models fall into four groups.
 
 #### 2.9.1 Baselines
 
-Two baselines tested the simplest explanations for any separation between IFN-low patients and controls. The first (M0a) used the IFN score of Section 2.3 as its only feature, and asked whether residual IFN activity below the cutoff is enough to separate the groups. The second (M0b) used a glucocorticoid-response score built from the prednisolone-responsive genes of Hu et al. [[4]](https://pubmed.ncbi.nlm.nih.gov/29534336/), and asked whether the separation merely reflects steroid treatment.
 
 #### 2.9.2 Expression-based comparators
 
-Four comparators used gene expression without any network structure. M1 applied an elastic net [[25]](https://doi.org/10.1111/j.1467-9868.2005.00503.x) or a random forest [[26]](https://doi.org/10.1023/A:1010933404324) to all genes, the standard approach of entering every gene into a single model. M2 fitted one model per pathway on gene expression and combined the pathway models in the same way as the LIONESS models (Section 2.10); it asked whether any gain comes from the pathways themselves rather than from the networks. M3 summarized each pathway by a single activity score (singscore [[16]](https://doi.org/10.1186/s12859-018-2435-4), mean z-score or first principal component), the classic pathway-activity approach, and also applied non-linear models, gradient boosting [[27]](https://doi.org/10.1145/2939672.2939785) and a kernel support vector machine [[28]](https://doi.org/10.1007/BF00994018), to pathway expression, which capture general interactions between genes without using network structure. M4 measured, for each pathway, how far a patient lies from the healthy centre, as the sum of squared standardized expression values or as the Mahalanobis distance, and asked whether patients simply scatter further from the healthy centre than controls do.
 
 #### 2.9.3 Established network comparators
 
-Two comparators represented network methods already used in lupus research. W1 reproduced a typical published weighted gene co-expression network analysis (WGCNA) [[29]](https://pubmed.ncbi.nlm.nih.gov/19114008/) and hub-gene pipeline, with every step fitted within the training folds to avoid data leakage. W2 used WGCNA module eigengenes, the summary scores of gene modules, estimated only from training data; W2 was the main established-network comparator.
 
 #### 2.9.4 LIONESS models
 
-Four models used single-sample networks estimated by LIONESS [[20]](https://pubmed.ncbi.nlm.nih.gov/30981959/). L1 used the edges of the partial-correlation networks as features. L2, the main model, used network summary features such as node strength and clustering (Section 2.8). L2-P was identical to L2 except that Pearson correlation replaced partial correlation, and asked whether partial correlation matters. L3 combined L2 with M2 and M0a, so that the network features were added to both pathway expression and the residual IFN score.
 
 #### 2.9.5 Primary comparison
 
-The primary hypothesis was tested by comparing L3 with a reference model, M5, that contains pathway expression and the residual IFN score (M2 plus M0a) but no network features. A gain of L3 over M5 is therefore evidence that networks carry information beyond both expression and residual IFN activity. All other comparisons were secondary.
 
 ### 2.10 Aggregation across pathways and contrasts
 
