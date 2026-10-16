@@ -61,13 +61,13 @@ Each cohort was processed separately, and no batch correction was applied across
 Interferon (IFN) activity was measured with a score built from four interferon-stimulated genes: IFI27, IFI44, IFI44L and RSAD2. This panel is used in clinical trials of type I IFN blockade to divide patients into IFN-high and IFN-low groups [[14]](https://pubmed.ncbi.nlm.nih.gov/31660791/). To place every sample on the scale of healthy blood, the expression of each gene was first standardized against the healthy controls (HC) of the training fold:
 
 ```math
-z_{gs} = \frac{x_{gs} - \bar{x}_g^{\mathrm{HC}}}{s_g^{\mathrm{HC}}} \tag{1}
+z_{gs} = \frac{x_{gs} - \bar{x}_g^{\mathrm{HC}}}{s_g^{\mathrm{HC}}} \qquad\qquad (1)
 ```
 
 Here, $`x_{gs}`$ is the expression of gene $`g`$ in sample $`s`$, and $`\bar{x}_g^{\mathrm{HC}}`$ and $`s_g^{\mathrm{HC}}`$ are the mean and standard deviation (SD) of that gene among the training-fold controls. The IFN score of a sample is the mean of its four standardized values:
 
 ```math
-S_s = \frac{1}{4} \sum_{g \in \mathcal{G}_{\mathrm{IFN}}} z_{gs}, \qquad \mathcal{G}_{\mathrm{IFN}} = \lbrace \mathrm{IFI27},\;\mathrm{IFI44},\;\mathrm{IFI44L},\;\mathrm{RSAD2} \rbrace \tag{2}
+S_s = \frac{1}{4} \sum_{g \in \mathcal{G}_{\mathrm{IFN}}} z_{gs}, \qquad \mathcal{G}_{\mathrm{IFN}} = \lbrace \mathrm{IFI27},\;\mathrm{IFI44},\;\mathrm{IFI44L},\;\mathrm{RSAD2} \rbrace \qquad\qquad (2)
 ```
 
 #### 2.3.2 IFN-low cutoff
@@ -75,7 +75,7 @@ S_s = \frac{1}{4} \sum_{g \in \mathcal{G}_{\mathrm{IFN}}} z_{gs}, \qquad \mathca
 A sample was classified as IFN-low when its score lay no more than two SD above the control mean:
 
 ```math
-S_s \le c, \qquad c = \bar{S}^{\mathrm{HC}} + 2\, s_S^{\mathrm{HC}} \tag{3}
+S_s \le c, \qquad c = \bar{S}^{\mathrm{HC}} + 2\, s_S^{\mathrm{HC}} \qquad\qquad (3)
 ```
 
 Here, $`\bar{S}^{\mathrm{HC}}`$ and $`s_S^{\mathrm{HC}}`$ are the mean and SD of the score among the training-fold controls. Because the cutoff $`c`$ depends on the data, it was estimated within each training fold and then applied, without change, to the test samples of that fold. Controls were filtered by the same rule, which removed about 2.5% of them, so that patients and controls entered the analysis on an equal footing. A stricter cutoff, $`c = \bar{S}^{\mathrm{HC}} + s_S^{\mathrm{HC}}`$, was examined in a sensitivity analysis.
