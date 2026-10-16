@@ -272,9 +272,6 @@ The implementation was checked against direct recomputation of equation (13) for
 
 [Not yet written]
 
-### 2.14 Software, reproducibility, pre-registration and availability
-
-[Not yet written]
 
 ## 3. Results
 
