@@ -3,7 +3,7 @@
 **Date:** 2026-10-15
 **Purpose:** a small pilot of the simulation study in the refined plan. It checks, on pretend data where the truth is known, whether the planned design gives the right answer before any real lupus data are analysed.
 
-**Scale:** one pathway of 10 genes (plus 4 interferon genes in the IFN pipeline), Gaussian data, 30 repeats per setting, 5-fold cross-validation. The full simulation in the plan will use more genes, realistic (plasmode) data and more repeats.
+**Scale:** one pathway of 10 genes (plus 4 interferon genes in the IFN pipeline), Gaussian data, 30 repeats per setting, 5-fold cross-validation. The full simulation in the plan will use more genes, data built from real control samples with known signals added and more repeats.
 
 ## How it follows the refined plan
 
