@@ -226,61 +226,57 @@ The implementation was checked against direct recomputation of equation (13) for
 
 ### 2.8 Topology features
 
-The same topology features were computed from the Pearson and the partial-correlation networks. LIONESS edges are signed, can lie outside the range $`[-1, 1]`$, and are present between every pair of genes, so each sample has a complete, weighted network for each pathway. Features that require a threshold to remove weak edges, such as degree, betweenness or modularity, were therefore not used, because their values depend on an arbitrary choice of threshold. For sample $`q`$ and a given pathway, let $`\mathbf{W}^{(q)}`$ be the $`G \times G`$ matrix of rescaled edges, with zeros on the diagonal and off-diagonal entries
+The same network features were computed from the Pearson and the partial-correlation LIONESS networks. LIONESS edges are signed, can lie outside the range $`[-1, 1]`$, and are present between every pair of genes, so each sample has a complete, weighted network for each pathway. For sample $`q`$ and a given pathway, let $`\mathbf{W}^{(q)}`$ be the $`G \times G`$ matrix of rescaled edges, with zeros on the diagonal and off-diagonal entries
 
 ```math
 w_{ij}^{(q)} = \frac{e_{ij}^{(q)}}{\kappa} \qquad\qquad (15)
 ```
 
-where $`\kappa`$ is the 99th percentile of $`|e_{ij}|`$ over all training samples and gene pairs of that pathway and association measure. Because the same factor $`\kappa`$ is used for every sample, the rescaling puts the edges on a common scale without removing genuine differences in edge size between samples. In what follows, the superscript $`(q)`$ is dropped, and $`m = G(G-1)/2`$ denotes the number of gene pairs.
+where $`\kappa`$ is the 99th percentile of $`|e_{ij}|`$ over all training samples and gene pairs of that pathway and association measure. Because the same factor $`\kappa`$ is used for every sample, the rescaling puts the edges on a common scale without removing genuine differences in edge size between samples. In what follows, the superscript $`(q)`$ is dropped, $`m = G(G-1)/2`$ is the number of gene pairs, and $`\mathbf{P}`$ is the reference network, the matrix of reference associations ($`r_{ij}`$ or $`\rho_{ij}`$) rescaled by the same $`\kappa`$ and with zeros on the diagonal. The features were organized in three tiers, fixed before the analysis: primary features, used in the main models; secondary features, used to examine hidden subgroups; and exploratory features, reported descriptively only.
 
-Three features were computed for each gene. The positive and negative strength of gene $`i`$ add up its positive and negative edges separately, so that they do not cancel:
-
-```math
-s_i^{+} = \sum_{j \ne i} \max\big(w_{ij}, 0\big), \qquad s_i^{-} = \sum_{j \ne i} \max\big(-w_{ij}, 0\big) \qquad\qquad (16)
-```
-
-The signed clustering coefficient measures whether the neighbours of gene $`i`$ are also linked to each other, that is, whether the gene sits in tightly knit triangles of genes. Following the weighted definition of Zhang and Horvath [[26]](https://doi.org/10.2202/1544-6115.1128), extended to signed weights by Costantini and Perugini [[27]](https://doi.org/10.1371/journal.pone.0088669), it is
+The four primary features each answer a different question about the sample's network. The first, the differential-network score, measures how closely the sample's network follows the pattern that separates patients from controls:
 
 ```math
-C_i = \frac{\sum_{j \ne i} \sum_{k \ne i, j} w_{ij}\, w_{jk}\, w_{ki}}{\sum_{j \ne i} \sum_{k \ne i, j} |w_{ij}|\, |w_{ki}|} \qquad\qquad (17)
+\mathrm{DN} = \sum_{i < j} \big(c_{ij}^{\mathrm{pat}} - c_{ij}^{\mathrm{con}}\big)\, e_{ij} \qquad\qquad (16)
 ```
 
-It is positive when the triangles around gene $`i`$ are mostly consistent in sign (for example, three positive edges) and negative when they are mostly inconsistent.
-
-Six features were computed for the network as a whole. The mean absolute edge weight summarizes the overall strength of the network,
+where $`c_{ij}^{\mathrm{pat}}`$ and $`c_{ij}^{\mathrm{con}}`$ are the associations between genes $`i`$ and $`j`$ estimated separately in the training patients and the training controls. Because it uses the group labels, the score was computed inside the training folds only, and the resulting weights were applied unchanged to the test samples. The second is the mean absolute edge weight, which summarizes how strongly the genes of the pathway are connected overall:
 
 ```math
-\bar{w} = \frac{1}{m} \sum_{i < j} |w_{ij}| \qquad\qquad (18)
+\bar{w} = \frac{1}{m} \sum_{i < j} |w_{ij}| \qquad\qquad (17)
 ```
 
-The proportion of positive edges describes the balance between positive and negative associations,
+The third is the largest eigenvalue of the network,
 
 ```math
-\pi^{+} = \frac{1}{m} \sum_{i < j} \mathbb{1}\big(w_{ij} > 0\big) \qquad\qquad (19)
+\lambda_{1} = \max_{\|\mathbf{v}\| = 1} \mathbf{v}^{\top} \mathbf{W} \mathbf{v} \qquad\qquad (18)
 ```
 
-where $`\mathbb{1}(\cdot)`$ equals 1 when the condition holds and 0 otherwise. The edge-weight entropy measures how evenly the total connection strength is spread across gene pairs. With $`p_{ij} = |w_{ij}| / \sum_{k < l} |w_{kl}|`$,
+which is large when many genes are connected in a single coordinated block. The fourth is the distance between the sample's network and the reference network,
 
 ```math
-H = -\frac{1}{\log m} \sum_{i < j} p_{ij} \log p_{ij} \qquad\qquad (20)
+D = \big\|\mathbf{W} - \mathbf{P}\big\|_F = \sqrt{\sum_{i \ne j} \big(w_{ij} - p_{ij}\big)^2} \qquad\qquad (19)
 ```
 
-which equals 1 when all edges have the same size and approaches 0 when the strength is concentrated in a few edges. The largest eigenvalue of $`\mathbf{W}`$ is large when many genes are connected in a single coordinated block. The last two features compare the sample's network with the reference network $`\mathbf{P}`$, the matrix of reference associations ($`r_{ij}`$ or $`\rho_{ij}`$), rescaled by the same $`\kappa`$ and with zeros on the diagonal. The distance from the reference is
+where $`\|\cdot\|_F`$ is the Frobenius norm, the square root of the sum of squared entries. By equation (8), an edge departs from its reference value through the products and squares of the sample's residuals, so $`D`$ reflects how far the sample lies from the reference centre and was interpreted as a measure of distance rather than of rewiring.
+
+The secondary features add the positive and negative strength of each gene, which sum its positive and negative edges separately so that they do not cancel:
 
 ```math
-D = \big\|\mathbf{W} - \mathbf{P}\big\|_F = \sqrt{\sum_{i \ne j} \big(w_{ij} - p_{ij}\big)^2} \qquad\qquad (21)
+s_i^{+} = \sum_{j \ne i} \max\big(w_{ij}, 0\big), \qquad s_i^{-} = \sum_{j \ne i} \max\big(-w_{ij}, 0\big) \qquad\qquad (20)
 ```
 
-where $`\|\cdot\|_F`$ is the Frobenius norm, the square root of the sum of squared entries, and the similarity to the reference is the Pearson correlation between the two sets of edges,
+Together with the four primary features, they form a secondary feature set used to examine whether IFN-low patients contain hidden subgroups, because groups of genes that shift together in a subset of patients change the strength of those genes.
+
+The exploratory features are the classical graph measures used in earlier single-sample network studies. Most of them are defined only for networks in which weak edges have been removed, so a threshold was applied:
 
 ```math
-R = \mathrm{cor}\big(\lbrace w_{ij} \rbrace_{i<j},\; \lbrace p_{ij} \rbrace_{i<j}\big) \qquad\qquad (22)
+a_{ij} = \mathbb{1}\big(|w_{ij}| > \tau\big) \qquad\qquad (21)
 ```
 
-The two measures answer different questions: $`D`$ reflects how large the departures from the reference are, whereas $`R`$ reflects whether the overall pattern of edges is preserved, regardless of their size. By equation (8), an edge departs from its reference value through the products and squares of the sample's residuals, so $`D`$ grows with how far the sample lies from the reference centre and was interpreted as a measure of distance rather than of rewiring.
+where $`\mathbb{1}(\cdot)`$ equals 1 when the condition holds and 0 otherwise, and $`\tau`$ is the 90th percentile of $`|w_{ij}|`$ over the training samples, the same for every sample. From the thresholded network, we computed the number of edges, $`\sum_{i<j} a_{ij}`$; the degree of each gene, $`k_i = \sum_{j \ne i} a_{ij}`$; the diameter, the longest shortest path between two genes; the transitivity, the proportion of connected triples of genes that form triangles; and the betweenness centrality of each gene, the proportion of shortest paths between other genes that pass through it. For path-based measures, the length of an edge was set to $`1/|w_{ij}|`$, so that strong edges count as short. Because these measures depend on the threshold, they were also computed at the 80th and 95th percentiles as a sensitivity analysis. The signed clustering coefficient [[26]](https://doi.org/10.2202/1544-6115.1128), [[27]](https://doi.org/10.1371/journal.pone.0088669), the proportion of positive edges, the entropy of the edge weights and the correlation between the sample's edges and the reference edges were also reported as exploratory features.
 
-Together, these features give $`3G + 6`$ values per sample and pathway: the positive strength, negative strength and signed clustering coefficient of each of the $`G`$ genes, plus the six network-level features. They formed the input to the topology models (Section 2.9).
+The choice of tiers was guided by the pilot simulation (Section 2.13). The four primary features detected rewired gene pairs (AUC 0.69–0.79 across pathways of 10–30 genes), whereas a larger set of nine summary features did not (AUC about 0.50). Adding the gene strengths improved the detection of hidden subgroups (AUC up to 0.94 for Pearson networks) but slightly reduced the detection of rewiring, and adding the exploratory graph measures reduced performance for both. Per pathway and association measure, the primary set contains 4 features and the secondary set $`2G + 4`$ features.
 
 ### 2.9 Baseline and comparator models
 
