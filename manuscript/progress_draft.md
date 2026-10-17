@@ -279,7 +279,7 @@ where $`\mathbb{1}(\cdot)`$ equals 1 when the condition holds and 0 otherwise, a
 
 ### 2.9 Baseline and comparator models
 
-Seventeen models were compared; they are listed in Table 2. Each model was chosen to answer one question about where any separation between IFN-low patients and controls comes from, and the models are labelled by group: M0 for baselines, M for expression-based comparators, W for established network methods and L for LIONESS models. All models were fitted within the training folds only, used the same cross-validation splits and were scored in the same way, so that differences in performance reflect the features rather than the set-up.
+Eighteen models were compared; they are listed in Table 2. Each model was chosen to answer one question about where any separation between IFN-low patients and controls comes from, and the models are labelled by group: M0 for baselines, M for expression-based comparators, W for established network methods and L for LIONESS models. All models were fitted within the training folds only, used the same cross-validation splits and were scored in the same way, so that differences in performance reflect the features rather than the set-up.
 
 #### 2.9.1 Baselines
 
@@ -295,7 +295,7 @@ Two comparators represented network methods already used in lupus research. W1 r
 
 #### 2.9.4 LIONESS models
 
-Five LIONESS models used the network features of Section 2.8, computed from the partial-correlation and the Pearson networks (Section 2.7). L1 used the network edges themselves. L2 used the four primary network features of each pathway from the partial-correlation networks, and L2-P used the same features from the Pearson networks; comparing the two shows whether the choice of association measure matters. L2-S used the secondary feature set, which adds the positive and negative strength of each gene, to examine hidden subgroups. L3 added the primary partial-correlation features to the reference model M5, and L3-P did the same with the Pearson features.
+Six LIONESS models used the network features of Section 2.8, computed from the partial-correlation and the Pearson networks (Section 2.7). L1 used the network edges themselves. L2 used the four primary network features of each pathway from the partial-correlation networks, and L2-P used the same features from the Pearson networks; comparing the two shows whether the choice of association measure matters. L2-S used the secondary feature set, which adds the positive and negative strength of each gene, to examine hidden subgroups. L3 added the primary partial-correlation features to the reference model M5, and L3-P did the same with the Pearson features.
 
 #### 2.9.5 Primary comparison
 
