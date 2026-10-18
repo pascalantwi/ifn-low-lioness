@@ -326,7 +326,23 @@ The primary hypothesis was tested by comparing L3 with M5, and L3-P with M5. Bec
 
 ### 2.10 Aggregation across pathways and contrasts
 
-[Not yet written]
+Each sample has features from many pathways, and these had to be combined into a single prediction. The primary method was group lasso logistic regression [[34]](https://doi.org/10.1111/j.1467-9868.2005.00532.x), which treats the features of each pathway as a group and keeps or drops a pathway as a whole. For a model with intercept $`\beta_0`$, coefficients $`\boldsymbol{\beta}_k`$ for the $`p_k`$ features of pathway $`k`$ and log-likelihood $`\ell`$, the coefficients were estimated by
+
+```math
+\hat{\boldsymbol{\beta}} = \arg\min_{\beta_0,\,\boldsymbol{\beta}} \Big\{ -\ell(\beta_0, \boldsymbol{\beta}) + \gamma \sum_{k} \sqrt{p_k}\, \big\|\boldsymbol{\beta}_k\big\|_2 \Big\} \qquad\qquad (22)
+```
+
+where $`\|\cdot\|_2`$ is the Euclidean length of a vector and $`\gamma`$ controls how many pathways are kept; $`\gamma`$ was chosen in the inner cross-validation. The factor $`\sqrt{p_k}`$ prevents larger pathways from being favoured simply because they contribute more features. The same aggregation was used for every pathway-based model (M2, M5, M6, L2, L2-P, L2-S, L3 and L3-P), so that differences between models reflect the features rather than the way they were combined. A two-level stacking approach, in which an elastic net was fitted to each pathway and the pathway predictions were combined by a non-negative elastic net, was used as a sensitivity analysis.
+
+To identify which pathways drive a result, the group lasso was refitted on $`B_s = 100`$ random half-samples of the training data, and the selection proportion of pathway $`k`$ was recorded as
+
+```math
+\hat{\Pi}_k = \frac{1}{B_s} \sum_{b=1}^{B_s} \mathbb{1}\big(\hat{\boldsymbol{\beta}}_k^{(b)} \ne \mathbf{0}\big) \qquad\qquad (23)
+```
+
+the proportion of refits in which the pathway was kept. This procedure, known as stability selection [[35]](https://doi.org/10.1111/j.1467-9868.2010.00740.x), favours pathways that are selected consistently rather than by chance. A pathway was described as implicated only if three conditions held: its selection proportion exceeded 0.6, within the range suggested by Meinshausen and Bühlmann [[35]](https://doi.org/10.1111/j.1467-9868.2010.00740.x); it differed between the groups in the population-level tests (Section 2.12); and both results remained after adjustment for cell composition and treatment.
+
+The pipeline was applied to five comparisons between groups, called contrasts. C1 compared IFN-high patients with healthy controls and served as a positive control, because a clear difference is expected; only in this contrast was the REACTOME_INTERFERON_SIGNALING pathway included (Section 2.5). C2 compared IFN-low patients with healthy controls and was the primary contrast. C3 compared IFN-low patients with patients with rheumatoid arthritis in [GSE110169](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE110169). C4 compared IFN-low patients with high and low disease activity (SLEDAI-2K of at least 6 and at most 4, respectively) in cohorts that recorded disease activity. C5 compared IFN-low patients with and without lupus nephritis, using the renal involvement recorded in each cohort. For each contrast, the LIONESS reference subsets and the differential-network score were built from the two groups being compared only. Contrasts C3 to C5 were analysed in a cohort only if each group contained at least 25 patients after the go/no-go check (Section 2.1); contrasts that did not meet this rule are reported with their group sizes, without model fitting.
 
 ### 2.11 Validation and statistical inference
 
@@ -388,6 +404,8 @@ The primary hypothesis was tested by comparing L3 with M5, and L3-P with M5. Bec
 31. Cortes C, Vapnik V. Support-vector networks. *Mach Learn* 1995;20:273–297. doi:[10.1007/BF00994018](https://doi.org/10.1007/BF00994018).
 32. Friedman JH. Regularized discriminant analysis. *J Am Stat Assoc* 1989;84(405):165–175. doi:[10.2307/2289860](https://doi.org/10.2307/2289860).
 33. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
+34. Yuan M, Lin Y. Model selection and estimation in regression with grouped variables. *J R Stat Soc Series B Stat Methodol* 2006;68(1):49–67. doi:[10.1111/j.1467-9868.2005.00532.x](https://doi.org/10.1111/j.1467-9868.2005.00532.x).
+35. Meinshausen N, Bühlmann P. Stability selection. *J R Stat Soc Series B Stat Methodol* 2010;72(4):417–473. doi:[10.1111/j.1467-9868.2010.00740.x](https://doi.org/10.1111/j.1467-9868.2010.00740.x).
 
 ## Supplementary material
 
