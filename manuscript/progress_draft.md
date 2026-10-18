@@ -56,7 +56,7 @@
 
 ### 2.1 Data sources and cohort eligibility
 
-All data were obtained from public whole-blood transcriptomic studies of systemic lupus erythematosus (SLE) deposited in the Gene Expression Omnibus (GEO) [[1]](https://pubmed.ncbi.nlm.nih.gov/23193258/). A study was eligible if it profiled peripheral whole blood, included either healthy controls (HC) or patients with another autoimmune disease, and provided enough sample annotation to infer sex and to separate patients from controls. The cohorts that met these criteria, and the role of each in the analysis, are summarized in [Table 1](#table-1).
+All data were obtained from public whole-blood transcriptomic studies of systemic lupus erythematosus (SLE) deposited in the Gene Expression Omnibus (GEO) [[1]](https://pubmed.ncbi.nlm.nih.gov/23193258/). A study was eligible if it profiled peripheral whole blood, included either healthy controls (HC) or patients with another autoimmune disease, and provided enough sample annotation to infer sex and to separate patients from controls. The cohorts that met these criteria, and the role of each in the analysis, are summarized in [Supplementary Table S1](#table-s1).
 
 [GSE319130](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE319130) served as the primary cohort. It is an RNA-sequencing study of 720 SLE patients and 84 HC, of whom 679 patients and 77 controls are female [[2]](https://pubmed.ncbi.nlm.nih.gov/42039161/), and it is the only cohort expected to have enough female controls to meet the primary-cohort criteria described below. [GSE88884](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE88884) was generated on the Affymetrix Human Transcriptome Array 2.0 and contains baseline blood samples from 1,760 SLE patients enrolled in the ILLUMINATE-1 and ILLUMINATE-2 phase III trials of tabalumab [[3]](https://pubmed.ncbi.nlm.nih.gov/27723281/). It contains 60 HC in total, so it could meet the requirement of 60 female controls for a primary cohort only if every control were female and none were removed by the IFN filter ([Section 2.3](#sec-2-3)); GSE88884 was therefore treated as a replication cohort.
 
@@ -65,22 +65,6 @@ Four smaller cohorts were included because each answers a question the primary c
 Public SLE series frequently reuse the same patients, and the same individual appearing in both training and test data would inflate performance. Overlap between series was checked by comparing GEO sample identifiers, sample titles and recorded patient characteristics such as age, sex and visit date. [GSE72326](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE72326) duplicates [GSE49454](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE49454) and was not used. [GSE45291](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE45291), [GSE121239](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE121239) and GSE224705 share patients and controls; of these three, only GSE224705 was used, because it records prednisone dose. Within each cohort, a single sample was kept per patient, taken from the first visit in longitudinal studies, and technical replicates were averaged.
 
 Whether a cohort could support the primary analysis was decided by a feasibility (go/no-go) check carried out before registration and before any model was fitted to the outcome. For each cohort, IFN-low patients and controls were counted by inferred sex ([Section 2.4](#sec-2-4)), and batch, age, ancestry and medication were tabulated by group. A cohort qualified as a primary cohort if it contained at least 80 female IFN-low patients and 60 female controls, and if batch was not confounded with group, meaning that patients and controls had not been processed in separate batches. Cohorts with at least 25 patients per group qualified as replication cohorts and were reported descriptively. As a rough guide to precision, the 95% confidence interval for an area under the receiver operating characteristic curve (AUC) of 0.70 has a half-width of about ±0.085 at the primary-cohort minimum and about ±0.15 at the replication minimum, based on the standard error of Hanley and McNeil [[9]](https://pubmed.ncbi.nlm.nih.gov/7063747/). These figures assume a single independent test set; the inference used for the actual model comparisons accounts for cross-validation and is described in [Section 2.11](#sec-2-11). Fixing these rules in advance ensured that the choice of cohorts could not be influenced by the results.
-
-<a id="table-1"></a>
-
-**Table 1.** Cohorts and their roles in the analysis. Counts are as reported in GEO and the original publications, before the go/no-go check.
-
-| GEO series | Platform | Population | SLE | Comparator | HC | Role |
-|---|---|---|---|---|---|---|
-| [GSE319130](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE319130) | RNA-seq | Adults | 720 (679 F) | None | 84 (77 F) | Primary cohort |
-| [GSE88884](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE88884) | Affymetrix HTA 2.0 | Adults, trial baseline | 1,760 | None | 60 (sex to confirm) | Replication cohort |
-| [GSE110169](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE110169) | Affymetrix | Adults | 82 | 84 RA | 77 | Comparison with RA; treatment checks |
-| [GSE65391](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391) | Illumina HT-12 | Children, longitudinal | 158 | None | 46 | Changes in IFN state over time; treatment checks |
-| [GSE99967](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE99967) | Affymetrix HuGene 2.0 | Adults | LN and non-LN (to confirm) | None | Fewer than 25 (to confirm) | Descriptive LN comparison only |
-| [GSE224705](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224705) | Affymetrix | Adults with LN | 163 | None | About 20, shared (to confirm) | Treatment analyses within patients only |
-| PRECISESADS | RNA-seq | Adults, seven diseases | If access granted | If access granted | If access granted | Extension, if access granted |
-
-F, female; HC, healthy controls; HTA, Human Transcriptome Array; LN, lupus nephritis; RA, rheumatoid arthritis.
 
 <a id="sec-2-2"></a>
 
@@ -320,12 +304,11 @@ a_{ij} = \mathbb{1}\big(|w_{ij}| > \tau\big) \qquad\qquad (21)
 
 where $`\mathbb{1}(\cdot)`$ equals 1 when the condition holds and 0 otherwise, and $`\tau`$ is the 90th percentile of $`|w_{ij}|`$ over the training samples, the same for every sample. From the thresholded network, we computed the number of edges, $`\sum_{i<j} a_{ij}`$; the degree of each gene, $`k_i = \sum_{j \ne i} a_{ij}`$; the diameter, the longest shortest path between two genes; the transitivity, the proportion of connected triples of genes that form triangles; and the betweenness centrality of each gene, the proportion of shortest paths between other genes that pass through it. For path-based measures, the length of an edge was set to $`1/|w_{ij}|`$, so that strong edges count as short. Because these measures depend on the threshold, they were also computed at the 80th and 95th percentiles as a sensitivity analysis. The signed clustering coefficient [[26]](https://doi.org/10.2202/1544-6115.1128), [[27]](https://doi.org/10.1371/journal.pone.0088669), the proportion of positive edges, the entropy of the edge weights and the correlation between the sample's edges and the reference edges were also reported as exploratory features.
 
-
 <a id="sec-2-9"></a>
 
 ### 2.9 Baseline and comparator models
 
-Eighteen models were compared; they are listed in [Table 2](#table-2). Each model was chosen to answer one question about where any separation between IFN-low patients and controls comes from, and the models are labelled by group: M0 for baselines, M for expression-based comparators, W for established network methods and L for LIONESS models. All models were fitted within the training folds only, used the same cross-validation splits and were scored in the same way, so that differences in performance reflect the features rather than the set-up.
+Eighteen models were compared; they are listed in [Supplementary Table S2](#table-s2). Each model was chosen to answer one question about where any separation between IFN-low patients and controls comes from, and the models are labelled by group: M0 for baselines, M for expression-based comparators, W for established network methods and L for LIONESS models. All models were fitted within the training folds only, used the same cross-validation splits and were scored in the same way, so that differences in performance reflect the features rather than the set-up.
 
 <a id="sec-2-9-1"></a>
 
@@ -357,31 +340,6 @@ Six LIONESS models used the network features of [Section 2.8](#sec-2-8), compute
 
 The primary hypothesis was tested by comparing L3 with M5, and L3-P with M5. Because each pair of models differs only in the network features, a gain over M5 is evidence that networks carry information beyond both pathway expression and residual IFN activity. Two secondary comparisons placed the network models against their strongest competitors: L2 and L2-P were compared with M6, the quadratic classifier, and with M4, the distance from health. All other comparisons were descriptive.
 
-<a id="table-2"></a>
-
-**Table 2.** Models compared in the study.
-
-| Group | Model | Features | Question answered |
-|---|---|---|---|
-| Baselines | M0a | Residual IFN score | Is residual IFN activity enough to separate the groups? |
-| | M0b | Glucocorticoid-response score | Is the separation due to steroid treatment? |
-| | M0c | Cell-composition scores | Is it due to blood cell proportions? |
-| | M0d | Age and ancestry | Is it due to age or ancestry? |
-| Expression | M1 | All genes (elastic net or random forest) | How well does the standard all-genes approach perform? |
-| | M2 | Pathway expression, combined across pathways | Do the pathways themselves carry the signal? |
-| | M3 | Pathway scores; boosting and kernel SVM on pathway expression | Do general gene interactions help, without networks? |
-| | M4 | Distance from the healthy centre per pathway | Do patients simply lie further from health? |
-| | M5 | M2 + M0a | Reference model for the primary comparison |
-| | M6 | Regularized quadratic discriminant analysis per pathway | Strongest direct competitor to network features |
-| Network methods | W1 | Published WGCNA and hub-gene pipeline, without leakage | What does the usual lupus network analysis achieve? |
-| | W2 | WGCNA module eigengenes from training data | Main established-network comparator |
-| LIONESS | L1 | Network edges | Do the raw edges carry the signal? |
-| | L2 | Four primary features, partial correlation | Main network model |
-| | L2-P | Four primary features, Pearson correlation | Does the association measure matter? |
-| | L2-S | Secondary features (primary + gene strengths) | Are there hidden subgroups? |
-| | L3 | L2 + M5 | Do partial-correlation networks add to expression and IFN? (primary) |
-| | L3-P | L2-P + M5 | Do Pearson networks add to expression and IFN? (primary) |
-
 <a id="sec-2-10"></a>
 
 ### 2.10 Aggregation across pathways and contrasts
@@ -412,7 +370,7 @@ Model performance was estimated within each eligible cohort by repeated, stratif
 
 The primary performance measure was the area under the receiver operating characteristic curve (AUC). Secondary measures were the Brier score, which measures the accuracy of predicted probabilities, and the calibration slope and intercept after Platt recalibration within the training folds [[36]](https://scholar.google.com/scholar?q=Platt+1999+Probabilistic+outputs+for+support+vector+machines). The area under the precision–recall curve was reported for each cohort together with the proportion of cases, because its value depends on the balance between the groups.
 
-Three hypotheses were specified in advance for contrast C2 (IFN-low patients versus healthy controls) in the primary cohort, restricted to females ([Section 2.4](#sec-2-4)). The primary hypothesis, H1, was that the network models add information beyond pathway expression and the residual IFN score: L3 has a higher AUC than M5 (H1a), and L3-P has a higher AUC than M5 (H1b) ([Table 2](#table-2)). The secondary hypothesis, H2, was that the network models outperform their strongest competitors: L2 and L2-P each have a higher AUC than M6, the quadratic classifier, and than M4, the distance from health. The third hypothesis, H3, was that the ranking of the models across the simulation scenarios agrees with the predictions of [Section 2.6](#sec-2-6) ([Section 2.13](#sec-2-13)). The Holm correction for multiple testing was applied across the two comparisons of H1 and, separately, across the four comparisons of H2. All other comparisons and contrasts were treated as exploratory and reported as estimates with confidence intervals.
+Three hypotheses were specified in advance for contrast C2 (IFN-low patients versus healthy controls) in the primary cohort, restricted to females ([Section 2.4](#sec-2-4)). The primary hypothesis, H1, was that the network models add information beyond pathway expression and the residual IFN score: L3 has a higher AUC than M5 (H1a), and L3-P has a higher AUC than M5 (H1b) ([Supplementary Table S2](#table-s2)). The secondary hypothesis, H2, was that the network models outperform their strongest competitors: L2 and L2-P each have a higher AUC than M6, the quadratic classifier, and than M4, the distance from health. The third hypothesis, H3, was that the ranking of the models across the simulation scenarios agrees with the predictions of [Section 2.6](#sec-2-6) ([Section 2.13](#sec-2-13)). The Holm correction for multiple testing was applied across the two comparisons of H1 and, separately, across the four comparisons of H2. All other comparisons and contrasts were treated as exploratory and reported as estimates with confidence intervals.
 
 Each comparison between two models, A and B, was summarized by the paired difference in AUC,
 
@@ -476,49 +434,27 @@ where $`\mathrm{BIC}_1`$ and $`\mathrm{BIC}_2`$ are the BIC values of the one- a
 
 ### 2.13 Simulation study
 
-The simulated data were built to mimic the real data, so that the behaviour of the pipeline in the simulation would carry over to the real analysis. Six features of the real data were reproduced: the genes analysed (the interferon sub-pathways without the four IFN-score genes, [Section 2.5](#sec-2-5)); the distribution of each gene; the correlations between genes; the shared IFN activity that makes the interferon genes rise and fall together; the selection of IFN-low patients by the in-fold cutoff ([Section 2.3](#sec-2-3)); and the group sizes of the primary cohort. All simulations started from the real expression data of the female healthy controls of [GSE319130](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE319130), processed and adjusted as in the real analysis ([Section 2.2](#sec-2-2), [Section 2.4](#sec-2-4)). Controls contain no disease signal, so any difference between simulated groups was added deliberately and is known.
-
-Two designs were used. In the resampling design, real control samples were randomly divided into pseudo-patients and pseudo-controls, and a known signal was added to the pseudo-patients; this keeps the exact noise of real blood data but allows only about 38 samples per group. In the generative design, new samples of any size were drawn from a model fitted to the same controls. For each sub-pathway, with $`\hat{F}_g`$ the distribution of gene $`g`$ in the controls and $`\hat{\mathbf{R}}`$ their shrinkage correlation matrix (equation 4), each sample was generated as
+The simulated data were built to mimic the real data: the genes of the interferon sub-pathways ([Section 2.5](#sec-2-5)), their distributions and correlations, the shared IFN activity that drives the interferon genes, the selection of IFN-low patients by the in-fold cutoff ([Section 2.3](#sec-2-3)) and the group sizes of the primary cohort. Simulations started from the female healthy controls of [GSE319130](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE319130), processed as in the real analysis ([Section 2.2](#sec-2-2), [Section 2.4](#sec-2-4)); because controls contain no disease signal, any difference between simulated groups is known. In a resampling design, real controls were split into pseudo-patients and pseudo-controls and a known signal was added to the pseudo-patients. In a generative design, new samples of any size were drawn from a Gaussian copula fitted to the controls,
 
 ```math
 x_g = \hat{F}_g^{-1}\big(\Phi(z_g)\big), \qquad \mathbf{z} = (z_1, \ldots, z_G)^{\top} \sim \mathcal{N}\big(\mathbf{0}, \hat{\mathbf{R}}\big) \qquad\qquad (31)
 ```
 
-where $`\Phi`$ is the standard normal cumulative distribution function and $`\hat{F}_g^{-1}`$ the quantile function of gene $`g`$. This Gaussian copula gives every simulated gene the distribution of the real gene and the genes the real correlations. To reproduce the shared IFN activity and the selection of IFN-low patients, each interferon gene, including the four score genes, was modelled as
+where $`\hat{F}_g^{-1}`$ is the quantile function of gene $`g`$ in the controls, $`\Phi`$ the standard normal cumulative distribution function and $`\hat{\mathbf{R}}`$ the shrinkage correlation matrix of the controls (equation 4). The shared IFN activity was added as
 
 ```math
 x_g = \mu_g + l_g\, f + \varepsilon_g \qquad\qquad (32)
 ```
 
-where $`\mu_g`$ is the mean of gene $`g`$, $`f`$ the IFN activity of the sample, $`l_g`$ the loading of gene $`g`$ (how strongly it follows IFN activity), estimated from the first principal component of the interferon genes in all SLE patients of the primary cohort, and $`\varepsilon_g`$ the remaining variation, generated by equation (31). The distribution of $`f`$ was chosen so that the simulated IFN scores matched the observed ones, and the IFN score and cutoff (equations 2 and 3) were then computed inside each training fold exactly as in the real analysis. How closely the simulated data resemble the real data was checked before use ([Supplementary Section S1](#supp-s1)).
+where $`\mu_g`$ is the mean of gene $`g`$, $`f`$ the IFN activity of the sample, $`l_g`$ the loading of gene $`g`$ on IFN activity and $`\varepsilon_g`$ the remaining variation from equation (31); the IFN score and cutoff (equations 2 and 3) were then applied as in the real analysis ([Supplementary Section S1](#supp-s1)).
 
-Known differences were added in eight scenarios ([Table 3](#table-3)): a shift in average expression (S1), an increase in spread (S2), hidden subgroups shifted in opposite directions (S3), changed partial correlations in 10% of gene pairs (S4), IFN-high patients whose interferon genes were lowered by treatment (S5), a difference only in the distribution of IFN activity, which isolates the selection effect (S6), IFN-high patients versus controls as a positive control (S7), and no difference (S0). The size of each difference was set so that the best possible classifier, which knows the true model, would reach an AUC of 0.60, 0.70 or 0.80, and every model's AUC was reported relative to this ceiling. Simulated group sizes were the numbers of female IFN-low patients and controls observed in the primary cohort after the go/no-go check ([Section 2.1](#sec-2-1)) and 40 per group. Each setting was repeated 200 times for single sub-pathways and 100 times for the full pipeline (details in [Supplementary Section S1](#supp-s1)).
-
-Each simulated dataset was analysed with exactly the real pipeline ([Section 2.7](#sec-2-7)–[Section 2.12](#sec-2-12)), including all models of [Table 2](#table-2). The recorded outcomes were the AUC of each model relative to the ceiling; the rejection rates of the hypothesis tests and of the three population-level layers; how often the subgroup check flagged each scenario; the false-positive rates in scenarios S0 and S6, which should not exceed 5%; the coverage of the confidence intervals of equation (25), which should be close to 95%; and the smallest AUC difference detectable with 80% power at the real sample size ([Section 2.11](#sec-2-11)). Scenarios S5 and S6 were analysed with and without the safeguards of [Section 2.3](#sec-2-3) to show how much each one reduces a false signal. The results were also used to write a reading guide that links each pattern of results to the kind of difference that causes it; all simulations were completed and the guide was fixed before any model was fitted to the real outcome data.
-
-<a id="table-3"></a>
-
-**Table 3.** Simulation scenarios.
-
-| Scenario | How the pseudo-patients differ | What it checks |
-|---|---|---|
-| S0 Null | No difference | False-positive rate of all tests; AUC close to 0.5 |
-| S1 Level | Mean shifted in 20% of genes | Level test; whether network features ignore level differences ([Section 2.6](#sec-2-6)) |
-| S2 Spread | Deviations multiplied by a factor above 1 | Spread test; distance-from-health baseline (M4) |
-| S3 Subgroups | Half shifted up, half down, on 20% of genes | Structure test; subgroup check; secondary features (L2-S) |
-| S4 Rewiring | Partial correlations changed in 10% of gene pairs | Structure test; primary network models (L2, L2-P, L3, L3-P) |
-| S5 Treatment | IFN-high patients with IFN genes reduced by treatment | Whether treated patients create false network differences; treatment exclusion |
-| S6 Selection | Only the distribution of IFN activity differs | Size of the selection effect; IFN-score conditioning and matching |
-| S7 Positive control | IFN-high patients versus controls | Whether contrast C1 detects a known difference |
-
+Eight scenarios were simulated ([Supplementary Table S3](#table-s3)): no difference (S0), a shift in average expression (S1), increased spread (S2), hidden subgroups (S3), changed partial correlations (S4), treated IFN-high patients (S5), a difference only in IFN activity, which isolates the selection effect (S6), and IFN-high patients versus controls (S7). Effect sizes were set so that the best possible classifier would reach an AUC of 0.60, 0.70 or 0.80, and group sizes matched the primary cohort or were 40 per group. Each simulated dataset was analysed with the real pipeline ([Section 2.7](#sec-2-7)–[Section 2.12](#sec-2-12)) to estimate model performance, the power and false-positive rates of the tests, the coverage of the confidence intervals of equation (25), the smallest detectable AUC difference and the effect of the safeguards of [Section 2.3](#sec-2-3) ([Supplementary Section S1](#supp-s1)).
 
 <a id="sec-2-14"></a>
 
 ### 2.14 Application to the SLE cohorts
 
-After the simulation study was complete and the reading guide fixed ([Section 2.13](#sec-2-13)), the pipeline was applied to the real cohorts in a fixed order, so that later steps could not influence earlier decisions. First, the go/no-go check was carried out on the IFN status, sex and group sizes of each cohort, without fitting any outcome model, and each cohort was assigned its role as primary, replication or descriptive ([Section 2.1](#sec-2-1), [Table 1](#table-1)). Second, the positive-control contrast C1, IFN-high patients versus healthy controls, was analysed to confirm that the pipeline detects a known difference in the real data ([Section 2.10](#sec-2-10)). Third, the primary analysis was run: contrast C2, IFN-low patients versus healthy controls, in the females of the primary cohort, [GSE319130](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE319130), testing hypotheses H1 and H2 ([Section 2.11](#sec-2-11)) and applying the population-level tests and subgroup check ([Section 2.12](#sec-2-12)). Fourth, the same analysis was repeated in the replication cohort, [GSE88884](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE88884), and the results were combined where possible (equation 26). Fifth, the secondary contrasts C3 to C5 were analysed in the cohorts that met the size rule, together with the secondary analysis of Immune System pathways ([Section 2.5](#sec-2-5)) and the treatment analyses ([Section 2.3](#sec-2-3)). The paediatric cohort, [GSE65391](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391), was analysed separately.
-
-
+After the simulation study was complete and the reading guide fixed ([Section 2.13](#sec-2-13)), the pipeline was applied to the real cohorts in a fixed order, so that later steps could not influence earlier decisions. First, the go/no-go check was carried out on the IFN status, sex and group sizes of each cohort, without fitting any outcome model, and each cohort was assigned its role as primary, replication or descriptive ([Section 2.1](#sec-2-1), [Supplementary Table S1](#table-s1)). Second, the positive-control contrast C1, IFN-high patients versus healthy controls, was analysed to confirm that the pipeline detects a known difference in the real data ([Section 2.10](#sec-2-10)). Third, the primary analysis was run: contrast C2, IFN-low patients versus healthy controls, in the females of the primary cohort, [GSE319130](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE319130), testing hypotheses H1 and H2 ([Section 2.11](#sec-2-11)) and applying the population-level tests and subgroup check ([Section 2.12](#sec-2-12)). Fourth, the same analysis was repeated in the replication cohort, [GSE88884](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE88884), and the results were combined where possible (equation 26). Fifth, the secondary contrasts C3 to C5 were analysed in the cohorts that met the size rule, together with the secondary analysis of Immune System pathways ([Section 2.5](#sec-2-5)) and the treatment analyses ([Section 2.3](#sec-2-3)). The paediatric cohort, [GSE65391](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391), was analysed separately.
 
 ## 3. Results
 
@@ -599,6 +535,10 @@ After the simulation study was complete and the reading guide fixed ([Section 2.
 
 where $`\mathbf{x}`$ is a pseudo-patient's expression vector, $`\boldsymbol{\mu}`$ the vector of gene means, $`\mathbf{D}_{\sigma}`$ the diagonal matrix of gene standard deviations, and the powers $`1/2`$ and $`-1/2`$ the symmetric matrix square root and its inverse; this changes the correlations exactly while keeping the means and variances. In S5, simulated patients with high IFN activity had the expression of the interferon genes reduced by a common factor, which lowered their IFN score below the cutoff while leaving the correlations of the IFN-high state in place. In S6, patients and controls differed only in the distribution of $`f`$ in equation (32).
 
+**Interferon activity model.** In equation (32), the loadings $`l_g`$ were estimated from the first principal component of the interferon genes in all SLE patients of the primary cohort, where IFN activity varies widely, and the distribution of $`f`$ was chosen so that the simulated IFN scores of patients and controls matched those observed. The four IFN-score genes were generated from the same model, the IFN score was computed by equation (2), and the cutoff $`\theta`$ of equation (3) was estimated and applied inside each training fold, so that the simulated IFN-low group was selected in the same way as the real one.
+
+**Outcomes.** For every scenario, the recorded outcomes were the AUC of each model, also expressed relative to the AUC of the best possible classifier; the rejection rates of the hypothesis tests and of the three population-level layers; how often the subgroup check flagged each scenario; the false-positive rates in scenarios S0 and S6, which should not exceed 5%; the coverage of the 95% confidence intervals of equation (25); and the smallest AUC difference detectable with 80% power at each sample size. Scenarios S5 and S6 were analysed with and without the safeguards of [Section 2.3](#sec-2-3). The results were used to write a reading guide linking each pattern of results to the kind of difference that causes it, which was fixed before any model was fitted to the real outcome data.
+
 **Repeats and computation.** Each setting was repeated 200 times when a single sub-pathway was analysed and 100 times when the full pipeline over all sub-pathways was run, giving Monte Carlo standard errors of at most 0.035 and 0.05 for estimated proportions; these are reported with every estimate. The generative design was run at both sample sizes, and the resampling design at the largest size the controls allow. The full-pipeline runs used one repeat of 5 outer folds instead of ten, with all other steps unchanged. LIONESS used $`B = 20`$ balanced reference subsets and both association measures, as in the real analysis.
 
 **Checking the simulated data.** For each sub-pathway, simulated data without added signal were compared with the real controls in four respects: the mean and variance of each gene, the distribution of all pairwise correlations, the distribution of the LIONESS edges, and, for equation (32), the distribution of the IFN score and the proportion of patients below the cutoff. The simulated and real distributions are shown overlaid.
@@ -606,3 +546,63 @@ where $`\mathbf{x}`$ is a pseudo-patient's expression vector, $`\boldsymbol{\mu}
 **Agreement with the theory.** The exact LIONESS edges were compared with the first-order formulas of [Section 2.6](#sec-2-6) in every scenario.
 
 **Pilot simulation.** A smaller pilot, run while the study was being designed, used multivariate normal data for single pathways of 10, 20 and 30 genes with 20 to 30 repeats per setting. Its results guided the choice of network features ([Section 2.8](#sec-2-8)) and population-level tests ([Section 2.12](#sec-2-12)); its code and results are archived with the analysis code. The full simulation replaces it for all inferences.
+
+<a id="supp-tables"></a>
+
+### Supplementary tables
+
+<a id="table-s1"></a>
+
+**Supplementary Table S1.** Cohorts and their roles in the analysis. Counts are as reported in GEO and the original publications, before the go/no-go check.
+
+| GEO series | Platform | Population | SLE | Comparator | HC | Role |
+|---|---|---|---|---|---|---|
+| [GSE319130](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE319130) | RNA-seq | Adults | 720 (679 F) | None | 84 (77 F) | Primary cohort |
+| [GSE88884](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE88884) | Affymetrix HTA 2.0 | Adults, trial baseline | 1,760 | None | 60 (sex to confirm) | Replication cohort |
+| [GSE110169](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE110169) | Affymetrix | Adults | 82 | 84 RA | 77 | Comparison with RA; treatment checks |
+| [GSE65391](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391) | Illumina HT-12 | Children, longitudinal | 158 | None | 46 | Changes in IFN state over time; treatment checks |
+| [GSE99967](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE99967) | Affymetrix HuGene 2.0 | Adults | LN and non-LN (to confirm) | None | Fewer than 25 (to confirm) | Descriptive LN comparison only |
+| [GSE224705](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224705) | Affymetrix | Adults with LN | 163 | None | About 20, shared (to confirm) | Treatment analyses within patients only |
+| PRECISESADS | RNA-seq | Adults, seven diseases | If access granted | If access granted | If access granted | Extension, if access granted |
+
+F, female; HC, healthy controls; HTA, Human Transcriptome Array; LN, lupus nephritis; RA, rheumatoid arthritis.
+
+<a id="table-s2"></a>
+
+**Supplementary Table S2.** Models compared in the study.
+
+| Group | Model | Features | Question answered |
+|---|---|---|---|
+| Baselines | M0a | Residual IFN score | Is residual IFN activity enough to separate the groups? |
+| | M0b | Glucocorticoid-response score | Is the separation due to steroid treatment? |
+| | M0c | Cell-composition scores | Is it due to blood cell proportions? |
+| | M0d | Age and ancestry | Is it due to age or ancestry? |
+| Expression | M1 | All genes (elastic net or random forest) | How well does the standard all-genes approach perform? |
+| | M2 | Pathway expression, combined across pathways | Do the pathways themselves carry the signal? |
+| | M3 | Pathway scores; boosting and kernel SVM on pathway expression | Do general gene interactions help, without networks? |
+| | M4 | Distance from the healthy centre per pathway | Do patients simply lie further from health? |
+| | M5 | M2 + M0a | Reference model for the primary comparison |
+| | M6 | Regularized quadratic discriminant analysis per pathway | Strongest direct competitor to network features |
+| Network methods | W1 | Published WGCNA and hub-gene pipeline, without leakage | What does the usual lupus network analysis achieve? |
+| | W2 | WGCNA module eigengenes from training data | Main established-network comparator |
+| LIONESS | L1 | Network edges | Do the raw edges carry the signal? |
+| | L2 | Four primary features, partial correlation | Main network model |
+| | L2-P | Four primary features, Pearson correlation | Does the association measure matter? |
+| | L2-S | Secondary features (primary + gene strengths) | Are there hidden subgroups? |
+| | L3 | L2 + M5 | Do partial-correlation networks add to expression and IFN? (primary) |
+| | L3-P | L2-P + M5 | Do Pearson networks add to expression and IFN? (primary) |
+
+<a id="table-s3"></a>
+
+**Supplementary Table S3.** Simulation scenarios.
+
+| Scenario | How the pseudo-patients differ | What it checks |
+|---|---|---|
+| S0 Null | No difference | False-positive rate of all tests; AUC close to 0.5 |
+| S1 Level | Mean shifted in 20% of genes | Level test; whether network features ignore level differences ([Section 2.6](#sec-2-6)) |
+| S2 Spread | Deviations multiplied by a factor above 1 | Spread test; distance-from-health baseline (M4) |
+| S3 Subgroups | Half shifted up, half down, on 20% of genes | Structure test; subgroup check; secondary features (L2-S) |
+| S4 Rewiring | Partial correlations changed in 10% of gene pairs | Structure test; primary network models (L2, L2-P, L3, L3-P) |
+| S5 Treatment | IFN-high patients with IFN genes reduced by treatment | Whether treated patients create false network differences; treatment exclusion |
+| S6 Selection | Only the distribution of IFN activity differs | Size of the selection effect; IFN-score conditioning and matching |
+| S7 Positive control | IFN-high patients versus controls | Whether contrast C1 detects a known difference |
