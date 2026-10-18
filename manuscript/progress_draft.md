@@ -518,28 +518,7 @@ Each simulated dataset was analysed with exactly the real pipeline ([Section 2.7
 
 After the simulation study was complete and the reading guide fixed ([Section 2.13](#sec-2-13)), the pipeline was applied to the real cohorts in a fixed order, so that later steps could not influence earlier decisions. First, the go/no-go check was carried out on the IFN status, sex and group sizes of each cohort, without fitting any outcome model, and each cohort was assigned its role as primary, replication or descriptive ([Section 2.1](#sec-2-1), [Table 1](#table-1)). Second, the positive-control contrast C1, IFN-high patients versus healthy controls, was analysed to confirm that the pipeline detects a known difference in the real data ([Section 2.10](#sec-2-10)). Third, the primary analysis was run: contrast C2, IFN-low patients versus healthy controls, in the females of the primary cohort, [GSE319130](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE319130), testing hypotheses H1 and H2 ([Section 2.11](#sec-2-11)) and applying the population-level tests and subgroup check ([Section 2.12](#sec-2-12)). Fourth, the same analysis was repeated in the replication cohort, [GSE88884](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE88884), and the results were combined where possible (equation 26). Fifth, the secondary contrasts C3 to C5 were analysed in the cohorts that met the size rule, together with the secondary analysis of Immune System pathways ([Section 2.5](#sec-2-5)) and the treatment analyses ([Section 2.3](#sec-2-3)). The paediatric cohort, [GSE65391](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE65391), was analysed separately.
 
-The results were interpreted with the reading guide produced by the simulation: the pattern of model performance across Table 2 and of the three population-level layers was matched to the simulation scenario that produces the same pattern, so that a result could be described as most consistent with, for example, a difference in correlation structure, in spread or in hidden subgroups. A difference was described as rewiring of the interferon pathway only if the primary network models outperformed the reference model, the structure test was significant, the subgroup check did not flag the pathway and the result held in the sensitivity analyses listed in [Table 4](#table-4).
-
-<a id="table-4"></a>
-
-**Table 4.** Sensitivity analyses applied to the primary analysis.
-
-| Sensitivity analysis | Concern addressed | Section |
-|---|---|---|
-| Stricter IFN cutoff (control mean + 1 SD) | Choice of cutoff | [Section 2.3](#sec-2-3) |
-| IFN-score-matched controls | Selection by IFN score | [Section 2.3](#sec-2-3) |
-| Removal of all type I interferon genes | Networks re-measuring IFN activity | [Section 2.3](#sec-2-3) |
-| Pearson edges after removing the IFN score | Networks re-measuring IFN activity | [Section 2.3](#sec-2-3) |
-| Exclusion of patients treated with hydroxychloroquine or immunosuppressants | Treatment mimicking IFN-low status | [Section 2.3](#sec-2-3) |
-| Both sexes, without Y-chromosome genes and XIST/TSIX | Restriction to females | [Section 2.4](#sec-2-4) |
-| Age range shared by patients and controls | Age differences | [Section 2.4](#sec-2-4) |
-| Removal of glucocorticoid-response genes | Steroid treatment | [Section 2.4](#sec-2-4) |
-| Removal of genes shared between sub-pathways | Overlapping sub-pathways | [Section 2.5](#sec-2-5) |
-| Partial correlations conditioned on pathway genes only | Choice of conditioning set | [Section 2.7](#sec-2-7) |
-| Exploratory graph measures at the 80th and 95th percentile thresholds | Choice of threshold | [Section 2.8](#sec-2-8) |
-| Two-level stacking instead of group lasso | Choice of aggregation | [Section 2.10](#sec-2-10) |
-| Corrected variance estimator of Nadeau and Bengio | Choice of inference method | [Section 2.11](#sec-2-11) |
-| Permutation within batches | Batch effects | [Section 2.12](#sec-2-12) |
+The results were interpreted with the reading guide produced by the simulation: the pattern of model performance across Table 2 and of the three population-level layers was matched to the simulation scenario that produces the same pattern, so that a result could be described as most consistent with, for example, a difference in correlation structure, in spread or in hidden subgroups. A difference was described as rewiring of the interferon pathway only if the primary network models outperformed the reference model, the structure test was significant, the subgroup check did not flag the pathway and the result held in the sensitivity analyses described in [Section 2.3](#sec-2-3) to [Section 2.12](#sec-2-12).
 
 <a id="sec-3"></a>
 
