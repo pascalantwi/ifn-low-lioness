@@ -408,7 +408,33 @@ The pipeline was applied to five comparisons between groups, called contrasts. C
 
 ### 2.11 Validation and statistical inference
 
-[Not yet written]
+Model performance was estimated within each eligible cohort by repeated, stratified, nested cross-validation, with one sample per patient: 10 repeats of 5 outer folds, each containing 5 inner folds. The outer folds estimated performance and the inner folds chose the tuning parameters, and repeating the whole procedure with different random splits reduced the dependence of the results on any single split. Folds were stratified by group and by batch ([Section 2.4](#sec-2-4)). Every step that learns from the data was carried out within the training folds only and then applied unchanged to the test fold: winsorizing and standardization, probe selection and gene filtering ([Section 2.2](#sec-2-2)), the IFN cutoff ([Section 2.3](#sec-2-3)), the shrinkage intensity $`\lambda`$ and the LIONESS reference subsets ([Section 2.7](#sec-2-7)), the rescaling factor $`\kappa`$, the differential-network weights and the threshold $`\tau`$ ([Section 2.8](#sec-2-8)), the WGCNA modules ([Section 2.9](#sec-2-9)), the group-lasso penalty $`\gamma`$ ([Section 2.10](#sec-2-10)) and the recalibration of predicted probabilities. Where two cohorts shared a platform and a contrast, models trained on one cohort were also applied unchanged to the other as an external validation.
+
+The primary performance measure was the area under the receiver operating characteristic curve (AUC). Secondary measures were the Brier score, which measures the accuracy of predicted probabilities, and the calibration slope and intercept after Platt recalibration within the training folds [[36]](https://scholar.google.com/scholar?q=Platt+1999+Probabilistic+outputs+for+support+vector+machines). The area under the precision–recall curve was reported for each cohort together with the proportion of cases, because its value depends on the balance between the groups.
+
+Three hypotheses were specified in advance for contrast C2 (IFN-low patients versus healthy controls) in the primary cohort, restricted to females ([Section 2.4](#sec-2-4)). The primary hypothesis, H1, was that the network models add information beyond pathway expression and the residual IFN score: L3 has a higher AUC than M5 (H1a), and L3-P has a higher AUC than M5 (H1b) ([Table 2](#table-2)). The secondary hypothesis, H2, was that the network models outperform their strongest competitors: L2 and L2-P each have a higher AUC than M6, the quadratic classifier, and than M4, the distance from health. The third hypothesis, H3, was that the ranking of the models across the simulation scenarios agrees with the predictions of [Section 2.6](#sec-2-6) ([Section 2.13](#sec-2-13)). The Holm correction for multiple testing was applied across the two comparisons of H1 and, separately, across the four comparisons of H2. All other comparisons and contrasts were treated as exploratory and reported as estimates with confidence intervals.
+
+Each comparison between two models, A and B, was summarized by the paired difference in AUC,
+
+```math
+\Delta_{AB} = \mathrm{AUC}_A - \mathrm{AUC}_B \qquad\qquad (24)
+```
+
+computed from the out-of-fold predictions of both models on the same samples and averaged over the repeats. Predictions from different folds of the same cross-validation are not independent, so standard tests such as DeLong's test understate the uncertainty. The standard error of $`\Delta_{AB}`$ was therefore estimated with the nested cross-validation method of Bates et al. [[37]](https://doi.org/10.1080/01621459.2023.2197686), and the 95% confidence interval was
+
+```math
+\Delta_{AB} \pm 1.96\, \widehat{\mathrm{SE}}\big(\Delta_{AB}\big) \qquad\qquad (25)
+```
+
+The corrected variance estimator of Nadeau and Bengio [[38]](https://doi.org/10.1023/A:1024068626366) was used as a sensitivity analysis. The false-positive rate of these tests was checked in the simulation scenario with no true difference ([Section 2.13](#sec-2-13)). Because differences between related models are expected to be small, results are reported mainly as estimates with confidence intervals, together with the smallest difference that each cohort could detect, which was computed by simulation before the analysis.
+
+When more than one cohort was eligible for a contrast, the cohort-specific differences $`\Delta_c`$ were combined by fixed-effect inverse-variance pooling,
+
+```math
+\bar{\Delta} = \frac{\sum_c w_c\, \Delta_c}{\sum_c w_c}, \qquad w_c = \frac{1}{\widehat{\mathrm{SE}}(\Delta_c)^2}, \qquad \widehat{\mathrm{SE}}(\bar{\Delta}) = \Big(\sum_c w_c\Big)^{-1/2} \qquad\qquad (26)
+```
+
+A fixed-effect model was used because the variation between cohorts cannot be estimated reliably from two or three cohorts, and whether the cohorts agreed in the direction of the effect is reported. Finally, as a check for data leakage, the group labels were randomly permuted and the full pipeline was re-run 200 times; without leakage, the AUC from permuted labels should be close to 0.5.
 
 <a id="sec-2-12"></a>
 
@@ -480,6 +506,9 @@ The pipeline was applied to five comparisons between groups, called contrasts. C
 33. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics* 2008;9:559. PMID [19114008](https://pubmed.ncbi.nlm.nih.gov/19114008/).
 34. Yuan M, Lin Y. Model selection and estimation in regression with grouped variables. *J R Stat Soc Series B Stat Methodol* 2006;68(1):49–67. doi:[10.1111/j.1467-9868.2005.00532.x](https://doi.org/10.1111/j.1467-9868.2005.00532.x).
 35. Meinshausen N, Bühlmann P. Stability selection. *J R Stat Soc Series B Stat Methodol* 2010;72(4):417–473. doi:[10.1111/j.1467-9868.2010.00740.x](https://doi.org/10.1111/j.1467-9868.2010.00740.x).
+36. Platt J. Probabilistic outputs for support vector machines and comparisons to regularized likelihood methods. In: Smola AJ, et al., editors. *Advances in Large Margin Classifiers*. MIT Press; 1999.
+37. Bates S, Hastie T, Tibshirani R. Cross-validation: what does it estimate and how well does it do it? *J Am Stat Assoc* 2024;119(546):1434–1445. doi:[10.1080/01621459.2023.2197686](https://doi.org/10.1080/01621459.2023.2197686).
+38. Nadeau C, Bengio Y. Inference for the generalization error. *Mach Learn* 2003;52:239–281. doi:[10.1023/A:1024068626366](https://doi.org/10.1023/A:1024068626366).
 
 ## Supplementary material
 
