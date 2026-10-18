@@ -486,7 +486,7 @@ In the synthetic data, the correlations between genes in 5,000 simulated control
 
 ### 3.2 Classification performance
 
-[Table 1](#table-1) gives the AUC of every model in each scenario for pathways of 20 genes, and [Figure 2](#figure-2) gives the relative AUC for all pathway sizes. In the null scenario S0, the mean AUC of every model lay between 0.48 and 0.51 at all pathway sizes. In the level scenario S1 at 20 genes, the highest AUCs were obtained by M5 (0.62), M1 (0.62) and M2 (0.62); the network-only models L1, L2 and L2-P had AUCs of 0.50, 0.50 and 0.49. In the spread scenario S2, M4 had the highest AUC (0.68; $`r`$ = 0.89), followed by M3-SVM (0.60) and L2-P (0.58). In the subgroup scenario S3, no model exceeded an AUC of 0.55 at 20 genes; at 10 genes, the highest AUCs were L2-S (0.59), L2-S-P (0.59), M6 (0.58). In the rewiring scenario S4 at 20 genes, the highest AUCs were obtained by L2-P (0.57), L3-P (0.56), M6 (0.56); L2 reached 0.54 and M5 0.51. At 10 genes in S4, L2-P reached 0.62 ($`r`$ = 0.60), the highest AUC of all models in that setting. The relative AUC of the best model in each scenario did not exceed 0.93 in any setting ([Figure 2](#figure-2)). The variation of the AUC between simulated datasets is shown in [Figure 9](#figure-9); at 20 genes in S4, the AUC of individual datasets ranged from 0.41 to 0.69 for L2-P and from 0.34 to 0.64 for M5.
+[Table 1](#table-1) gives the AUC of every model in each scenario for pathways of 20 genes, and [Figure 2](#figure-2) gives the relative AUC for all pathway sizes. In the null scenario S0, the mean AUC of every model lay between 0.48 and 0.51 at all pathway sizes. In the level scenario S1 at 20 genes, the highest AUCs were obtained by M5 (0.62), M1 (0.62) and M2 (0.62); the network-only models L1, L2 and L2-P had AUCs of 0.50, 0.50 and 0.49. In the spread scenario S2, M4 had the highest AUC (0.68; $`r`$ = 0.89), followed by M3-SVM (0.60) and L2-P (0.58). In the subgroup scenario S3, no model exceeded an AUC of 0.55 at 20 genes; at 10 genes, the highest AUCs were L2-S (0.59), L2-S-P (0.59), M6 (0.58). In the rewiring scenario S4 at 20 genes, the highest AUCs were obtained by L2-P (0.57), L3-P (0.56), M6 (0.56); L2 reached 0.54 and M5 0.51. At 10 genes in S4, L2-P reached 0.62 ($`r`$ = 0.60), the highest AUC of all models in that setting. The relative AUC of the best model in each scenario did not exceed 0.93 in any setting ([Figure 2](#figure-2)). The variation of the AUC between simulated datasets is shown in [Figure 3](#figure-3); at 20 genes in S4, the AUC of individual datasets ranged from 0.41 to 0.69 for L2-P and from 0.34 to 0.64 for M5.
 
 <a id="table-1"></a>
 
@@ -524,11 +524,11 @@ The corresponding tables for pathways of 10, 30, 50 and 60 genes are given in [S
 
 **Figure 2.** Performance map. Each cell gives the relative AUC $`r`$ (equation 33) of one model (rows, grouped by family) in one scenario and pathway size (columns); the first block gives the AUC in the null scenario S0. Darker cells indicate a larger share of the available signal captured. The 60-gene columns are a stress test beyond the 50-gene limit of [Section 2.5](#sec-2-5).
 
-<a id="figure-9"></a>
+<a id="figure-3"></a>
 
-![Figure 9](figures/fig9_auc_distribution.png)
+![Figure 3](figures/fig3_auc_distribution.png)
 
-**Figure 9.** AUC of six models in each of the 50 simulated datasets, pathways of 20 genes, in the null scenario S0 and the rewiring scenario S4. Each point is one dataset, the shaded area shows the distribution and the horizontal bar the median; the dashed line marks the AUC of the best possible classifier.
+**Figure 3.** AUC of six models in each of the 50 simulated datasets, pathways of 20 genes, in the null scenario S0 and the rewiring scenario S4. Each point is one dataset, the shaded area shows the distribution and the horizontal bar the median; the dashed line marks the AUC of the best possible classifier.
 
 <a id="sec-3-3"></a>
 
@@ -586,13 +586,13 @@ Values are mean AUC over 50 datasets (partial-correlation / Pearson); Monte Carl
 
 ### 3.5 Similarity between models
 
-[Figure 6](#figure-6) places each model on a map according to its AUC across scenarios S1–S4 and the five pathway sizes. The first two components accounted for 54% and 30% of the variation in AUC between models. The network-only models L2, L2-P, L2-S, L2-S-P, L-explo and L-sec+explo formed one group; M1, M2 and M5 formed a second group; M0a, L1, W2 and M3-score lay together in the upper part of the map; M4 and M3-SVM lay in the lower part; and L3, L3-P, M6 and M3-boost lay near the centre.
+[Figure 5](#figure-5) places each model on a map according to its AUC across scenarios S1–S4 and the five pathway sizes. The first two components accounted for 54% and 30% of the variation in AUC between models. The network-only models L2, L2-P, L2-S, L2-S-P, L-explo and L-sec+explo formed one group; M1, M2 and M5 formed a second group; M0a, L1, W2 and M3-score lay together in the upper part of the map; M4 and M3-SVM lay in the lower part; and L3, L3-P, M6 and M3-boost lay near the centre.
 
-<a id="figure-6"></a>
+<a id="figure-5"></a>
 
-![Figure 6](figures/fig6_model_map.png)
+![Figure 5](figures/fig5_model_map.png)
 
-**Figure 6.** Model similarity map. Principal component analysis of the mean AUC of each model in scenarios S1–S4 at the five pathway sizes; models close together had similar performance profiles. Colours indicate model families.
+**Figure 5.** Model similarity map. Principal component analysis of the mean AUC of each model in scenarios S1–S4 at the five pathway sizes; models close together had similar performance profiles. Colours indicate model families.
 
 <a id="sec-3-6"></a>
 
@@ -619,7 +619,7 @@ Each cell gives the false-positive rate (percentage of 50 datasets in which the 
 
 ### 3.7 Population-level tests and subgroup check
 
-[Table 5](#table-5) and [Figure 3](#figure-3) give the rejection rates of the three layers of [Section 2.12](#sec-2-12). In S0, the rejection rates at 20 genes were 4% (level), 4% (spread) and 6% and 6% (structure, partial and Pearson), and across all sizes they ranged from 0% to 8%. The level test rejected in 100%, 76%, 66%, 48% and 42% of datasets in S1 at 10, 20, 30, 50 and 60 genes. The spread test rejected in at least 98% of datasets in S2 at every size. In S4, the Pearson structure test rejected in 76%, 40%, 40%, 20% and 16% of datasets at the five sizes, and the partial-correlation structure test in 14%, 12%, 8%, 4% and 2%. In S3, the partial-correlation structure test rejected in 38% of datasets at 10 genes and in 6% to 8% at 20 genes or more. The subgroup check flagged 0% of S3 datasets at every size and 4% or fewer of datasets in any scenario. In the positive-control scenario S7, with expression adjusted for the IFN score, the rejection rates of all four tests were at most 12%.
+[Table 5](#table-5) and [Figure 6](#figure-6) give the rejection rates of the three layers of [Section 2.12](#sec-2-12). In S0, the rejection rates at 20 genes were 4% (level), 4% (spread) and 6% and 6% (structure, partial and Pearson), and across all sizes they ranged from 0% to 8%. The level test rejected in 100%, 76%, 66%, 48% and 42% of datasets in S1 at 10, 20, 30, 50 and 60 genes. The spread test rejected in at least 98% of datasets in S2 at every size. In S4, the Pearson structure test rejected in 76%, 40%, 40%, 20% and 16% of datasets at the five sizes, and the partial-correlation structure test in 14%, 12%, 8%, 4% and 2%. In S3, the partial-correlation structure test rejected in 38% of datasets at 10 genes and in 6% to 8% at 20 genes or more. The subgroup check flagged 0% of S3 datasets at every size and 4% or fewer of datasets in any scenario. In the positive-control scenario S7, with expression adjusted for the IFN score, the rejection rates of all four tests were at most 12%.
 
 <a id="table-5"></a>
 
@@ -634,13 +634,13 @@ Each cell gives the false-positive rate (percentage of 50 datasets in which the 
 | S4 rewiring | 2% | 8% | 12% | 40% | 0% |
 | S7 positive control | 0% | 6% | 0% | 0% | 0% |
 
-Percentage of 50 datasets with p < 0.05 (199 permutations); expression adjusted for the IFN score. Results for 50 genes are shown in Figure 3 and for all sizes in Supplementary Table S8.
+Percentage of 50 datasets with p < 0.05 (199 permutations); expression adjusted for the IFN score. Results for 50 genes are shown in Figure 6 and for all sizes in Supplementary Table S8.
 
-<a id="figure-3"></a>
+<a id="figure-6"></a>
 
-![Figure 3](figures/fig3_detection_fingerprint.png)
+![Figure 6](figures/fig6_detection_fingerprint.png)
 
-**Figure 3.** Detection fingerprint of the population-level tests. Each circle gives the percentage of 50 simulated datasets in which a test (columns) rejected at p < 0.05 in a scenario (rows), for pathways of 20 and 50 genes; circle area is proportional to the percentage.
+**Figure 6.** Detection fingerprint of the population-level tests. Each circle gives the percentage of 50 simulated datasets in which a test (columns) rejected at p < 0.05 in a scenario (rows), for pathways of 20 and 50 genes; circle area is proportional to the percentage.
 
 <a id="sec-3-8"></a>
 
@@ -725,13 +725,13 @@ where $`z_{0.975}`$ and $`z_{0.80}`$ are standard normal quantiles and the media
 
 ### 3.10 Agreement with the first-order formula
 
-[Figure 5](#figure-5) compares the exact LIONESS edges (equation 6) with the first-order approximation of equation (9) for 30 samples of a simulated control set of 167 samples. With shrinkage ($`\lambda`$ = 0.2), the correlation between exact and approximate edges was 0.9998, 0.9997, 0.9993, 0.9993 and 0.9989 for 10, 20, 30, 50 and 60 genes, and the median absolute difference was 0.010, 0.021, 0.034, 0.060 and 0.065, against a standard deviation of the exact edges of 0.67 to 0.78. Without shrinkage (equation 8), the correlations were 0.9998 to 0.9958 and the median absolute differences 0.014 to 0.199. At 60 genes, the approximate edges were smaller in absolute value than the exact edges for the largest edges ([Figure 5](#figure-5)b); the 95th percentile of the absolute difference was 0.42 with shrinkage and 1.26 without.
+[Figure 9](#figure-9) compares the exact LIONESS edges (equation 6) with the first-order approximation of equation (9) for 30 samples of a simulated control set of 167 samples. With shrinkage ($`\lambda`$ = 0.2), the correlation between exact and approximate edges was 0.9998, 0.9997, 0.9993, 0.9993 and 0.9989 for 10, 20, 30, 50 and 60 genes, and the median absolute difference was 0.010, 0.021, 0.034, 0.060 and 0.065, against a standard deviation of the exact edges of 0.67 to 0.78. Without shrinkage (equation 8), the correlations were 0.9998 to 0.9958 and the median absolute differences 0.014 to 0.199. At 60 genes, the approximate edges were smaller in absolute value than the exact edges for the largest edges ([Figure 9](#figure-9)b); the 95th percentile of the absolute difference was 0.42 with shrinkage and 1.26 without.
 
-<a id="figure-5"></a>
+<a id="figure-9"></a>
 
-![Figure 5](figures/fig5_first_order.png)
+![Figure 9](figures/fig9_first_order.png)
 
-**Figure 5.** Exact LIONESS edges (equation 6) against the first-order approximation (equation 9) with shrinkage intensity $`\lambda`$ = 0.2, for pathways of (a) 20 and (b) 60 genes. Each point is one edge of one sample; the dashed line is the line of equality.
+**Figure 9.** Exact LIONESS edges (equation 6) against the first-order approximation (equation 9) with shrinkage intensity $`\lambda`$ = 0.2, for pathways of (a) 20 and (b) 60 genes. Each point is one edge of one sample; the dashed line is the line of equality.
 
 <a id="sec-4"></a>
 
@@ -1568,7 +1568,7 @@ for k, G in enumerate(SIZES):
     for s in ax.spines.values(): s.set_visible(False)
 cb = fig.colorbar(im, ax=axes, fraction=0.015, pad=0.01); cb.set_label("AUC")
 fig.savefig("../../manuscript/figures/fig2_auc_heatmap.png", bbox_inches="tight"); plt.close()
-# Figure 3: rejection rates of population tests and subgroup flag at 20 genes
+# Figure 6: rejection rates of population tests and subgroup flag at 20 genes
 labs = ["Level", "Spread", "Structure (partial)", "Structure (Pearson)", "Subgroup flag"]; keys = layers + ["flag"]
 cols = [BLUE, ORANGE, AQUA, YELLOW, VIOLET]; scs = SCEN + ["S7"]
 fig, ax = plt.subplots(figsize=(7.2, 3.0)); w = 0.15
@@ -1645,7 +1645,7 @@ ax.tick_params(length=0)
 cb = fig.colorbar(im, ax=ax, fraction=0.02, pad=0.01); cb.set_label("AUC relative to the best possible classifier")
 fig.savefig(FIG + "fig2_performance_map.png", bbox_inches="tight"); plt.close()
 
-# ---------- Figure 3: detection fingerprint (dot matrix)
+# ---------- Figure 6: detection fingerprint (dot matrix)
 P = {tuple(k.split("|")): v for k, v in S["pop"].items()}
 tests = [("level", "Level\n(eq. 27)"), ("spread", "Spread\n(eq. 28)"), ("structure", "Structure,\npartial (eq. 29)"), ("structure-P", "Structure,\nPearson"), ("flag", "Subgroup\nflag (eq. 30)")]
 scs = ["S0", "S1", "S2", "S3", "S4", "S7"]; names = {"S0": "S0 null", "S1": "S1 level", "S2": "S2 spread", "S3": "S3 subgroups", "S4": "S4 rewiring", "S7": "S7 positive control"}
@@ -1664,7 +1664,7 @@ for a, G in zip(axs, [20, 50]):
     for s in a.spines.values(): s.set_visible(False)
     a.tick_params(length=0)
 fig.text(0.5, -0.02, "Number in each circle: percentage of simulated datasets with p < 0.05 (circle area proportional)", ha="center", fontsize=7, color=MUTED)
-fig.tight_layout(); fig.savefig(FIG + "fig3_detection_fingerprint.png", bbox_inches="tight"); plt.close()
+fig.tight_layout(); fig.savefig(FIG + "fig6_detection_fingerprint.png", bbox_inches="tight"); plt.close()
 
 # ---------- Figure 4: effect of pathway size (lines with Monte Carlo bands, direct labels)
 show = [("L2", BLUE), ("L2-P", ORANGE), ("L1", AQUA), ("M6", YELLOW), ("M4", MAGENTA), ("M2", GREEN)]
@@ -1682,7 +1682,7 @@ from matplotlib.lines import Line2D
 fig.legend([Line2D([0], [0], color=c, lw=2, marker="o", ms=4) for _, c in show], [m for m, _ in show], loc="lower center", ncol=6, frameon=False, bbox_to_anchor=(0.5, -0.06), fontsize=8)
 fig.tight_layout(rect=(0, 0.05, 1, 1)); fig.savefig(FIG + "fig4_pathway_size.png", bbox_inches="tight"); plt.close()
 
-# ---------- Figure 6: model similarity map (PCA of AUC profiles across scenarios and sizes)
+# ---------- Figure 5: model similarity map (PCA of AUC profiles across scenarios and sizes)
 X = np.array([[auc(G, sc, m)[0] for sc in SCEN[1:] for G in SIZES] for m in MODELS])
 Xc = X - X.mean(0); U, s, Vt = np.linalg.svd(Xc, full_matrices=False); Z = U[:, :2]*s[:2]; ve = s**2/np.sum(s**2)
 fig, a = plt.subplots(figsize=(5.4, 4.2))
@@ -1702,7 +1702,7 @@ for i, m in enumerate(MODELS):
 a.axhline(0, color=GRID, lw=0.8, zorder=0); a.axvline(0, color=GRID, lw=0.8, zorder=0)
 a.set_xlabel(f"Component 1 ({100*ve[0]:.0f}% of variation)"); a.set_ylabel(f"Component 2 ({100*ve[1]:.0f}% of variation)")
 a.legend(frameon=False, fontsize=7, loc="best")
-fig.tight_layout(); fig.savefig(FIG + "fig6_model_map.png", bbox_inches="tight"); plt.close()
+fig.tight_layout(); fig.savefig(FIG + "fig5_model_map.png", bbox_inches="tight"); plt.close()
 json.dump({"pca_var": ve[:3].tolist(), "loadings": {f"{sc}|{G}": [float(Vt[0, i]), float(Vt[1, i])] for i, (sc, G) in enumerate([(sc, G) for sc in SCEN[1:] for G in SIZES])}}, open("pca.json", "w"), indent=1)
 
 # ---------- Figure 7: safeguards across pathway sizes (small multiples)
@@ -1742,7 +1742,7 @@ for a, sc in zip(axs, ["S3", "S4"]):
 axs[0].set_ylabel("Power (proportion significant)"); axs[1].legend(frameon=False, fontsize=6, loc="upper left", bbox_to_anchor=(1.0, 1.0))
 fig.tight_layout(); fig.savefig(FIG + "fig8_power.png", bbox_inches="tight"); plt.close()
 
-# ---------- Figure 9: distribution of AUC across simulated datasets (violin + points), S4, 20 genes
+# ---------- Figure 3: distribution of AUC across simulated datasets (violin + points), S4, 20 genes
 ms = [("M5", ORANGE), ("M6", YELLOW), ("L2", BLUE), ("L2-P", VIOLET), ("L3", AQUA), ("L3-P", MAGENTA)]
 fig, axs = plt.subplots(1, 2, figsize=(8.0, 3.0), sharey=True)
 rng = np.random.default_rng(0)
@@ -1758,14 +1758,14 @@ for a, sc in zip(axs, ["S0", "S4"]):
     if sc == "S4": a.axhline(cal["20|S4|0.7"][1], color=INK, lw=0.8, ls="--"); a.text(5.4, cal["20|S4|0.7"][1] + 0.01, "best possible", fontsize=6, ha="right")
     a.set_xticks(range(len(ms))); a.set_xticklabels([m for m, _ in ms]); a.set_title({"S0": "S0 null", "S4": "S4 rewiring"}[sc] + ", 20 genes", loc="left", fontsize=9)
 axs[0].set_ylabel("AUC per simulated dataset")
-fig.tight_layout(); fig.savefig(FIG + "fig9_auc_distribution.png", bbox_inches="tight"); plt.close()
+fig.tight_layout(); fig.savefig(FIG + "fig3_auc_distribution.png", bbox_inches="tight"); plt.close()
 print("figures written")
 ```
 
 **figs_static.py**
 
 ```python
-"""Figure 1 (synthetic data check) and Figure 5 (exact vs first-order LIONESS edges)."""
+"""Figure 1 (synthetic data check) and Figure 9 (exact vs first-order LIONESS edges)."""
 import json, numpy as np, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 import simlib as L
@@ -1794,7 +1794,7 @@ ax[1].axvline(theta, color=INK, lw=1); ax[1].text(theta + .15, ax[1].get_ylim()[
 ax[1].set_xlabel("IFN score (equation 2)"); ax[1].set_ylabel("Density"); ax[1].legend(frameon=False, fontsize=8, loc="upper right")
 ax[1].set_title("b  IFN score distributions", loc="left", fontsize=9)
 fig.tight_layout(); fig.savefig("../../manuscript/figures/fig1_synthetic_check.png"); plt.close()
-# ---- Figure 5: exact vs first-order edges
+# ---- Figure 9: exact vs first-order edges
 def exact_vs_approx(G, lam, n=167, nq=30):
     st = L.Structure(G); X, _, _ = L.draw(st, n, rng); iu = np.triu_indices(G, 1)
     def pc(Z):
@@ -1822,6 +1822,6 @@ for k, G in enumerate([10, 20, 30, 50, 60]):
             lim = [ex.min(), ex.max()]; a.plot(lim, lim, color=MUTED, lw=1, ls="--")
             a.set_title(f"{'a' if G == 20 else 'b'}  {G} genes, λ = 0.2 (r = {np.corrcoef(ex, ap)[0, 1]:.3f})", loc="left", fontsize=9)
             a.set_xlabel("Exact LIONESS edge (equation 6)"); a.set_ylabel("First-order edge (equation 9)")
-fig.tight_layout(); fig.savefig("../../manuscript/figures/fig5_first_order.png"); plt.close()
+fig.tight_layout(); fig.savefig("../../manuscript/figures/fig9_first_order.png"); plt.close()
 json.dump(out, open("static_results.json", "w"), indent=1); print(json.dumps(out, indent=1))
 ```
