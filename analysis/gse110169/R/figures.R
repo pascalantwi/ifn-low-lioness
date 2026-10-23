@@ -21,7 +21,7 @@ p1 <- ggplot(d1, aes(group, I)) + geom_violin(fill = "grey93", colour = NA, widt
   geom_jitter(aes(colour = status), width = 0.15, size = 1.6, alpha = 0.85) +
   geom_hline(yintercept = ic$theta, linetype = "dashed") +
   annotate("text", x = 0.55, y = ic$theta, label = "cutoff (HC mean + 2 SD)", vjust = -0.5, hjust = 0, size = 3) +
-  geom_text(data = lab1, aes(group, max(d1$I) * 1.08, label = lab), size = 3, vjust = 1) +
+  geom_text(data = lab1, aes(group, max(d1$I) + 1.1, label = lab), size = 3, vjust = 1) + expand_limits(y = max(d1$I) + 1.2) +
   scale_colour_manual(values = c(`IFN-high` = "#D55E00", `IFN-low` = "#0072B2"), name = NULL) +
   labs(x = NULL, y = "IFN score (equation 2)", title = "IFN score in GSE110169")
 ggsave(file.path(FIG, "fig1_ifn_score.png"), p1, width = 5.5, height = 4.2, dpi = 300, bg = "white")
@@ -97,11 +97,12 @@ ggsave(file.path(FIG, "fig7_differential_network.png"), p7, width = 7, height = 
 
 ## LIONESS primary features by group (full-data, descriptive)
 fe <- do.call(rbind, lapply(names(D)[-1], function(n) cbind(pathway = n, D[[n]]$features)))
-fe <- fe[fe$pathway == pwn, ]; fl <- reshape(fe, varying = c("DN", "meanw", "eta1", "D"), v.names = "value", timevar = "feature", times = c("DN score", "Mean |w|", "Largest eigenvalue", "Distance D"), direction = "long")
-fl$group <- factor(fl$group, c("HC", "SLE IFN-low", "RA IFN-low", "SLE IFN-high")); fl$measure <- factor(fl$measure, c("partial", "pearson"), c("Partial correlation", "Pearson correlation"))
+fe <- fe[fe$pathway == pwn & !is.na(fe$group), ]; fl <- reshape(fe, varying = c("DN", "meanw", "eta1", "D"), v.names = "value", timevar = "feature", times = c("DN score", "Mean |w|", "Largest eigenvalue", "Distance D"), direction = "long")
+fl$group <- factor(fl$group, c("HC", "SLE IFN-low", "RA IFN-low", "RA IFN-high", "SLE IFN-high")); fl$measure <- factor(fl$measure, c("partial", "pearson"), c("Partial correlation", "Pearson correlation"))
 fl$feature <- factor(fl$feature, c("DN score", "Mean |w|", "Largest eigenvalue", "Distance D"))
-p8 <- ggplot(fl, aes(group, value, fill = group)) + geom_boxplot(outlier.size = 0.5, width = 0.7) + facet_grid(feature ~ measure, scales = "free_y") +
-  scale_fill_manual(values = c(HC = "#999999", `SLE IFN-low` = "#0072B2", `RA IFN-low` = "#009E73", `SLE IFN-high` = "#D55E00"), guide = "none") +
+fl$panel <- factor(paste0(fl$feature, ", ", tolower(fl$measure)), unique(paste0(fl$feature, ", ", tolower(fl$measure))[order(fl$feature, fl$measure)]))
+p8 <- ggplot(fl, aes(group, value, fill = group)) + geom_boxplot(outlier.size = 0.5, width = 0.7) + facet_wrap(~ panel, scales = "free_y", ncol = 2) +
+  scale_fill_manual(values = c(HC = "#999999", `SLE IFN-low` = "#0072B2", `RA IFN-low` = "#009E73", `RA IFN-high` = "#56B4E9", `SLE IFN-high` = "#D55E00"), guide = "none") +
   labs(x = NULL, y = NULL, title = "LIONESS network features by group", subtitle = "Interferon alpha/beta signalling; balanced reference of HC and IFN-low SLE (descriptive)") +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 ggsave(file.path(FIG, "fig8_lioness_features.png"), p8, width = 6.5, height = 8, dpi = 300, bg = "white")

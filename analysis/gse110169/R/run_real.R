@@ -113,7 +113,7 @@ N_PERM <- if (length(args) >= 3) as.integer(args[3]) else 0
 if (N_PERM > 0) {   # leakage check (Section 2.11): group labels permuted within the contrast universe, one repeat each
   group0 <- group; auc <- function(p, y) { r <- rank(p); n1 <- sum(y); n0 <- sum(1 - y); (sum(r[y == 1]) - n1 * (n1 + 1) / 2) / (n1 * n0) }
   for (cn in CONTR) { univ <- which(group0 %in% CONTRASTS[[cn]]$univ); out <- list()
-    for (b in 1:N_PERM) { set.seed(50000 + b); group <<- group0; group[univ] <<- sample(group0[univ])
+    for (b in 1:N_PERM) { set.seed(50000 + b); group <- group0; group[univ] <- sample(group0[univ])
       f <- integer(length(univ)); strat <- group[univ]
       for (sg in unique(strat)) { i <- which(strat == sg); f[i] <- sample(rep(1:5, length.out = length(i))) }
       jobs <- lapply(1:5, function(k) list(c = cn, rep = 1000 + b, k = k, tr = univ[f != k], te = univ[f == k]))
