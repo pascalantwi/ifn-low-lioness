@@ -92,6 +92,11 @@ run_fold <- function(job) {
       Pm <- f(X[tr, ], Ct, lam); kappa <- quantile(abs(L$tr), 0.99)
       dP <- (f(X[tr, ][y == 1, ], if (is.null(Ct)) NULL else Ct[y == 1, ], lam) - f(X[tr, ][y == 0, ], if (is.null(Ct)) NULL else Ct[y == 0, ], lam))[ut]
       Ft <- net_features(L$tr, Pm, kappa, dP, G); Fs <- net_features(L$te, Pm, kappa, dP, G)
+      ## cross-fitted DN score for training samples: weights estimated without the sample's inner fold
+      cf <- strat_folds(y, 5)
+      for (k in 1:5) { a <- cf != k
+        dPk <- (f(X[tr, ][a & y == 1, ], if (is.null(Ct)) NULL else Ct[a & y == 1, ], lam) - f(X[tr, ][a & y == 0, ], if (is.null(Ct)) NULL else Ct[a & y == 0, ], lam))[ut]
+        Ft[cf == k, "DN"] <- L$tr[cf == k, , drop = FALSE] %*% dPk }
       full <- matrix(0, nrow(Xall), ncol(Ft)); full[tr, ] <- Ft; full[te, ] <- Fs
       if (meas == "partial") { Fp[[n]] <- full; e <- matrix(0, nrow(Xall), ncol(L$tr)); e[tr, ] <- L$tr; e[te, ] <- L$te; edges[[n]] <- e } else Fq[[n]] <- full
     } }

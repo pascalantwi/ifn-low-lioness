@@ -29,7 +29,11 @@ for (n in names(PW)) {
     L <- lioness(X[ref, ], y, X[oth, , drop = FALSE], f, if (is.null(C)) NULL else C[ref, ], if (is.null(C)) NULL else C[oth, ], lam)
     Pm <- f(X[ref, ], if (is.null(C)) NULL else C[ref, ], lam); kappa <- quantile(abs(L$tr), 0.99)
     dP <- (f(X[ref, ][y == 1, ], if (is.null(C)) NULL else C[ref, ][y == 1, ], lam) - f(X[ref, ][y == 0, ], if (is.null(C)) NULL else C[ref, ][y == 0, ], lam))[ut]
-    Fm <- rbind(net_features(L$tr, Pm, kappa, dP, G), net_features(L$te, Pm, kappa, dP, G))[, 1:4]
+    Ft <- net_features(L$tr, Pm, kappa, dP, G); cf <- strat_folds(y, 5)
+    for (k in 1:5) { a <- cf != k; Cr <- if (is.null(C)) NULL else C[ref, ]
+      dPk <- (f(X[ref, ][a & y == 1, ], if (is.null(Cr)) NULL else Cr[a & y == 1, ], lam) - f(X[ref, ][a & y == 0, ], if (is.null(Cr)) NULL else Cr[a & y == 0, ], lam))[ut]
+      Ft[cf == k, "DN"] <- L$tr[cf == k, , drop = FALSE] %*% dPk }
+    Fm <- rbind(Ft, net_features(L$te, Pm, kappa, dP, G))[, 1:4]
     feats[[meas]] <- data.frame(sample = c(ref, oth), group = grp4[c(ref, oth)], measure = meas, Fm) }
   out[[n]] <- list(pcor = pc, features = do.call(rbind, feats), genes = colnames(X))
   cat(n, "done\n")
