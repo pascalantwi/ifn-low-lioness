@@ -85,15 +85,35 @@ ggsave(file.path(FIG, "fig6_pcor_heatmap.png"), p6, width = 7.5, height = 7, dpi
 ## differential network: 30 largest changes between IFN-low SLE and HC
 dn <- pc$`SLE IFN-low` - pc$HC; ut <- which(upper.tri(dn), arr.ind = TRUE)
 ed <- data.frame(a = rownames(dn)[ut[, 1]], b = colnames(dn)[ut[, 2]], d = dn[ut]); ed <- ed[order(-abs(ed$d)), ][1:30, ]
-gr <- graph_from_data_frame(ed, directed = FALSE); set.seed(3); lay <- layout_with_fr(gr)
-nd <- data.frame(name = V(gr)$name, x = lay[, 1], y = lay[, 2]); ed$x <- nd$x[match(ed$a, nd$name)]; ed$y <- nd$y[match(ed$a, nd$name)]
+gr <- graph_from_data_frame(ed, directed = FALSE); set.seed(11)
+lay <- layout_with_kk(gr); lay <- apply(lay, 2, function(v) (v - min(v)) / diff(range(v)))
+## move any node that sits on an edge it is not part of, perpendicular to that edge
+for (it in 1:50) { moved <- FALSE
+  for (k in seq_len(nrow(ed))) { a <- match(ed$a[k], V(gr)$name); b <- match(ed$b[k], V(gr)$name)
+    for (v in setdiff(seq_len(nrow(lay)), c(a, b))) { P <- lay[v, ]; A <- lay[a, ]; B <- lay[b, ]; AB <- B - A
+      u <- sum((P - A) * AB) / sum(AB^2); if (u <= 0 || u >= 1) next
+      Q <- A + u * AB; dd <- sqrt(sum((P - Q)^2))
+      if (dd < 0.05) { nrm <- if (dd > 1e-9) (P - Q) / dd else c(-AB[2], AB[1]) / sqrt(sum(AB^2)); lay[v, ] <- Q + nrm * 0.06; moved <- TRUE } } }
+  if (!moved) break }
+nd <- data.frame(name = V(gr)$name, x = lay[, 1], y = lay[, 2], degree = degree(gr))
+ed$x <- nd$x[match(ed$a, nd$name)]; ed$y <- nd$y[match(ed$a, nd$name)]
 ed$xe <- nd$x[match(ed$b, nd$name)]; ed$ye <- nd$y[match(ed$b, nd$name)]
-p7 <- ggplot() + geom_segment(data = ed, aes(x, y, xend = xe, yend = ye, colour = d > 0, linewidth = abs(d)), alpha = 0.8) +
-  geom_point(data = nd, aes(x, y), size = 3, colour = "grey30") + geom_text_repel(data = nd, aes(x, y, label = name), size = 3, max.overlaps = 50) +
-  scale_colour_manual(values = c(`TRUE` = "#B2182B", `FALSE` = "#2166AC"), labels = c(`TRUE` = "stronger in IFN-low SLE", `FALSE` = "weaker in IFN-low SLE"), name = NULL) +
-  scale_linewidth(range = c(0.4, 2.2), guide = "none") + theme_void(base_size = 10) + theme(legend.position = "bottom", plot.title = element_text(face = "bold")) +
-  labs(title = "Largest partial-correlation differences, IFN-low SLE vs HC", subtitle = "Interferon alpha/beta signalling; 30 gene pairs with the largest absolute change (descriptive)")
-ggsave(file.path(FIG, "fig7_differential_network.png"), p7, width = 7, height = 6, dpi = 300, bg = "white")
+ed$dir <- ifelse(ed$d > 0, "Stronger in IFN-low SLE", "Weaker in IFN-low SLE")
+p7 <- ggplot() +
+  geom_segment(data = ed, aes(x, y, xend = xe, yend = ye, colour = dir, linewidth = abs(d)), lineend = "round", alpha = 0.85) +
+  geom_point(data = nd, aes(x, y), size = 16, shape = 21, fill = "#FDF6E3", colour = "grey25", stroke = 0.9) +
+  geom_text(data = nd, aes(x, y, label = name), size = 2.2, fontface = "bold", colour = "grey10") +
+  scale_colour_manual(values = c(`Stronger in IFN-low SLE` = "#B2182B", `Weaker in IFN-low SLE` = "#2166AC"), name = NULL) +
+  scale_linewidth(range = c(0.5, 3), name = expression("|" * Delta * " partial correlation|"), breaks = scales::pretty_breaks(3)) +
+  scale_size(range = c(13, 17), guide = "none") +
+  coord_equal(clip = "off") + scale_x_continuous(expand = expansion(0.08)) + scale_y_continuous(expand = expansion(0.08)) +
+  theme_void(base_size = 10) +
+  theme(legend.position = "bottom", legend.box = "vertical", plot.title = element_text(face = "bold", size = 12),
+        plot.subtitle = element_text(size = 9, colour = "grey30"), plot.margin = margin(10, 15, 10, 15)) +
+  guides(colour = guide_legend(override.aes = list(linewidth = 2), order = 1), linewidth = guide_legend(order = 2)) +
+  labs(title = "Differential co-expression network: IFN-low SLE versus healthy controls",
+       subtitle = "Interferon alpha/beta signalling. Edges: the 30 gene pairs with the largest change in partial correlation\n(conditioned on the IFN score and cell-composition scores). Descriptive.")
+ggsave(file.path(FIG, "fig7_differential_network.png"), p7, width = 8, height = 8.5, dpi = 300, bg = "white")
 
 ## LIONESS primary features by group (full-data, descriptive)
 fe <- do.call(rbind, lapply(names(D)[-1], function(n) cbind(pathway = n, D[[n]]$features)))
