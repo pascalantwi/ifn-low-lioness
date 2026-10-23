@@ -44,9 +44,9 @@ ax.tick_params(length=0)
 cb = fig.colorbar(im, ax=ax, fraction=0.02, pad=0.01); cb.set_label("AUC relative to the best possible classifier")
 fig.savefig(FIG + "fig2_performance_map.png", bbox_inches="tight"); plt.close()
 
-# ---------- Figure 3: detection fingerprint (dot matrix)
+# ---------- Figure 6: detection fingerprint (dot matrix)
 P = {tuple(k.split("|")): v for k, v in S["pop"].items()}
-tests = [("level", "Level\n(eq. 27)"), ("spread", "Spread\n(eq. 28)"), ("structure", "Structure,\npartial (eq. 29)"), ("structure-P", "Structure,\nPearson"), ("flag", "Subgroup\nflag (eq. 30)")]
+tests = [("level", "Level\n(eq. 26)"), ("spread", "Spread\n(eq. 27)"), ("structure", "Structure,\npartial (eq. 28)"), ("structure-P", "Structure,\nPearson"), ("flag", "Subgroup\nflag (eq. 29)")]
 scs = ["S0", "S1", "S2", "S3", "S4", "S7"]; names = {"S0": "S0 null", "S1": "S1 level", "S2": "S2 spread", "S3": "S3 subgroups", "S4": "S4 rewiring", "S7": "S7 positive control"}
 fig, axs = plt.subplots(1, 2, figsize=(8.0, 3.4), gridspec_kw=dict(width_ratios=[1, 1]))
 for a, G in zip(axs, [20, 50]):
@@ -63,7 +63,7 @@ for a, G in zip(axs, [20, 50]):
     for s in a.spines.values(): s.set_visible(False)
     a.tick_params(length=0)
 fig.text(0.5, -0.02, "Number in each circle: percentage of simulated datasets with p < 0.05 (circle area proportional)", ha="center", fontsize=7, color=MUTED)
-fig.tight_layout(); fig.savefig(FIG + "fig3_detection_fingerprint.png", bbox_inches="tight"); plt.close()
+fig.tight_layout(); fig.savefig(FIG + "fig6_detection_fingerprint.png", bbox_inches="tight"); plt.close()
 
 # ---------- Figure 4: effect of pathway size (lines with Monte Carlo bands, direct labels)
 show = [("L2", BLUE), ("L2-P", ORANGE), ("L1", AQUA), ("M6", YELLOW), ("M4", MAGENTA), ("M2", GREEN)]
@@ -74,43 +74,57 @@ for k, sc in enumerate(["S1", "S2", "S3", "S4"]):
     for m, c in show:
         y = np.array([auc(G, sc, m)[0] for G in SIZES]); e = np.array([auc(G, sc, m)[1] for G in SIZES])
         a.fill_between(SIZES, y - 1.96*e, y + 1.96*e, color=c, alpha=0.15, linewidth=0); a.plot(SIZES, y, color=c, lw=2, marker="o", ms=3.5, markeredgecolor="white", markeredgewidth=0.8)
-        if k == 3: a.text(63.5, y[-1], m, color=INK, fontsize=7, va="center")
     a.set_title({"S1": "S1 level", "S2": "S2 spread", "S3": "S3 subgroups", "S4": "S4 rewiring"}[sc], loc="left", fontsize=9)
     a.set_xticks(SIZES); a.set_xlabel("Genes in pathway"); a.set_xlim(7, 63); a.set_ylim(0.4, 0.92)
     if k == 0: a.set_ylabel("AUC")
-fig.tight_layout(); fig.savefig(FIG + "fig4_pathway_size.png", bbox_inches="tight"); plt.close()
+from matplotlib.lines import Line2D
+fig.legend([Line2D([0], [0], color=c, lw=2, marker="o", ms=4) for _, c in show], [m for m, _ in show], loc="lower center", ncol=6, frameon=False, bbox_to_anchor=(0.5, -0.06), fontsize=8)
+fig.tight_layout(rect=(0, 0.05, 1, 1)); fig.savefig(FIG + "fig4_pathway_size.png", bbox_inches="tight"); plt.close()
 
-# ---------- Figure 6: model similarity map (PCA of AUC profiles across scenarios and sizes)
+# ---------- Figure 5: model similarity map (PCA of AUC profiles across scenarios and sizes)
 X = np.array([[auc(G, sc, m)[0] for sc in SCEN[1:] for G in SIZES] for m in MODELS])
 Xc = X - X.mean(0); U, s, Vt = np.linalg.svd(Xc, full_matrices=False); Z = U[:, :2]*s[:2]; ve = s**2/np.sum(s**2)
 fig, a = plt.subplots(figsize=(5.4, 4.2))
 for fam, ms in FAM:
     idx = [MODELS.index(m) for m in ms]
     a.scatter(Z[idx, 0], Z[idx, 1], s=60, color=FAMCOL[fam], edgecolor="white", linewidth=1.5, label=fam, zorder=3)
-for i, m in enumerate(MODELS): a.annotate(m, (Z[i, 0], Z[i, 1]), xytext=(4, 3), textcoords="offset points", fontsize=6.5, color=INK)
+pos = Z.copy(); span = np.ptp(Z, 0); lab = pos + np.array([0.012, 0.0])*span/0.4
+for _ in range(400):
+    for i in range(len(lab)):
+        for j in range(len(lab)):
+            if i == j: continue
+            d = (lab[i] - lab[j])/span; dist = np.hypot(*d)
+            if dist < 0.06: lab[i] += (d/(dist + 1e-9))*0.004*span
+for i, m in enumerate(MODELS):
+    a.annotate(m, Z[i], xytext=lab[i] + np.array([0.02, 0])*span, fontsize=6.5, color=INK, va="center",
+               arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.5) if np.hypot(*((lab[i] - Z[i])/span)) > 0.03 else None)
 a.axhline(0, color=GRID, lw=0.8, zorder=0); a.axvline(0, color=GRID, lw=0.8, zorder=0)
 a.set_xlabel(f"Component 1 ({100*ve[0]:.0f}% of variation)"); a.set_ylabel(f"Component 2 ({100*ve[1]:.0f}% of variation)")
 a.legend(frameon=False, fontsize=7, loc="best")
-fig.tight_layout(); fig.savefig(FIG + "fig6_model_map.png", bbox_inches="tight"); plt.close()
+fig.tight_layout(); fig.savefig(FIG + "fig5_model_map.png", bbox_inches="tight"); plt.close()
 json.dump({"pca_var": ve[:3].tolist(), "loadings": {f"{sc}|{G}": [float(Vt[0, i]), float(Vt[1, i])] for i, (sc, G) in enumerate([(sc, G) for sc in SCEN[1:] for G in SIZES])}}, open("pca.json", "w"), indent=1)
 
-# ---------- Figure 7: safeguards (dumbbell)
+# ---------- Figure 7: safeguards across pathway sizes (small multiples)
 C = {tuple(k.split("|")): v for k, v in S["gc"].items()}
-metrics = [("L3", "AUC, L3"), ("L3-P", "AUC, L3-P"), ("L2", "AUC, L2"), ("structure", "Structure test\nrejection rate"), ("L3vsM5_sig", "L3 > M5\n(significant)")]
+metrics = [("L3", "AUC of L3"), ("L3vsM5_sig", "L3 significantly > M5"), ("structure-P", "Structure test (Pearson)\nrejection rate"), ("level", "Level test\nrejection rate")]
 vcol = {"none": RED, "cond": YELLOW, "restrict": AQUA, "both": BLUE}
-vlab = {"none": "No safeguard", "cond": "IFN-score conditioning", "restrict": "Exclusion (S5) / matching (S6)", "both": "Both safeguards"}
-fig, axs = plt.subplots(1, 2, figsize=(8.4, 3.2), sharey=True)
-for a, sc in zip(axs, ["S5", "S6"]):
-    for i, (m, lab) in enumerate(metrics):
-        vals = {v: C.get((sc, "20", v), {}).get(m, [np.nan])[0] for v in vcol}
-        a.plot([vals["none"], vals["both"]], [i, i], color=GRID, lw=3, zorder=1)
-        for v, c in vcol.items(): a.scatter(vals[v], i, s=45, color=c, edgecolor="white", linewidth=1.2, zorder=3, label=vlab[v] if i == 0 else None)
-    a.set_yticks(range(len(metrics))); a.set_yticklabels([l for _, l in metrics]); a.invert_yaxis()
-    a.axvline(0.5, color=MUTED, lw=0.8, ls=":"); a.axvline(0.05, color=MUTED, lw=0.8, ls="--")
-    a.set_xlim(-0.02, 1.0); a.set_title({"S5": "S5 treatment (no true difference)", "S6": "S6 selection (no true difference)"}[sc], loc="left", fontsize=9)
-    a.set_xlabel("Value (AUC or proportion)"); a.grid(axis="x", color=GRID, lw=0.6); a.set_axisbelow(True)
-axs[0].legend(frameon=False, fontsize=6.5, loc="upper center", bbox_to_anchor=(1.05, 1.28), ncol=4)
-fig.tight_layout(); fig.savefig(FIG + "fig7_safeguards.png", bbox_inches="tight"); plt.close()
+vlab = {"none": "No safeguard", "cond": "IFN-score conditioning", "restrict": "Exclusion (S5) or matching (S6)", "both": "Both safeguards"}
+fig, axs = plt.subplots(2, 4, figsize=(10.5, 4.8), sharex=True)
+for r, sc in enumerate(["S5", "S6"]):
+    for c, (m, lab) in enumerate(metrics):
+        a = axs[r, c]
+        for v, col in vcol.items():
+            y = [C.get((sc, str(G), v), {}).get(m, [np.nan])[0] for G in SIZES]
+            a.plot(SIZES, y, color=col, lw=2, marker="o", ms=3.5, markeredgecolor="white", markeredgewidth=0.8, label=vlab[v])
+        a.axhline(0.5 if m == "L3" else 0.05, color=MUTED, lw=0.8, ls=":")
+        a.set_ylim(0.4, 0.82) if m == "L3" else a.set_ylim(-0.02, 1.02)
+        if r == 0: a.set_title(lab, fontsize=8, loc="left")
+        if c == 0: a.set_ylabel({"S5": "S5 treatment", "S6": "S6 selection"}[sc], fontsize=9)
+        if r == 1: a.set_xlabel("Genes in pathway"); a.set_xticks(SIZES)
+        a.axvspan(55, 63, color=GRID, zorder=0)
+h, l = axs[0, 0].get_legend_handles_labels()
+fig.legend(h, l, loc="lower center", ncol=4, frameon=False, fontsize=8, bbox_to_anchor=(0.5, -0.02))
+fig.tight_layout(rect=(0, 0.05, 1, 1)); fig.savefig(FIG + "fig7_safeguards.png", bbox_inches="tight"); plt.close()
 
 # ---------- Figure 8: power curves for the primary comparison
 Bp = {tuple(k.split("|")): v for k, v in S["gb"].items()}
@@ -127,7 +141,7 @@ for a, sc in zip(axs, ["S3", "S4"]):
 axs[0].set_ylabel("Power (proportion significant)"); axs[1].legend(frameon=False, fontsize=6, loc="upper left", bbox_to_anchor=(1.0, 1.0))
 fig.tight_layout(); fig.savefig(FIG + "fig8_power.png", bbox_inches="tight"); plt.close()
 
-# ---------- Figure 9: distribution of AUC across simulated datasets (violin + points), S4, 20 genes
+# ---------- Figure 3: distribution of AUC across simulated datasets (violin + points), S4, 20 genes
 ms = [("M5", ORANGE), ("M6", YELLOW), ("L2", BLUE), ("L2-P", VIOLET), ("L3", AQUA), ("L3-P", MAGENTA)]
 fig, axs = plt.subplots(1, 2, figsize=(8.0, 3.0), sharey=True)
 rng = np.random.default_rng(0)
@@ -143,5 +157,5 @@ for a, sc in zip(axs, ["S0", "S4"]):
     if sc == "S4": a.axhline(cal["20|S4|0.7"][1], color=INK, lw=0.8, ls="--"); a.text(5.4, cal["20|S4|0.7"][1] + 0.01, "best possible", fontsize=6, ha="right")
     a.set_xticks(range(len(ms))); a.set_xticklabels([m for m, _ in ms]); a.set_title({"S0": "S0 null", "S4": "S4 rewiring"}[sc] + ", 20 genes", loc="left", fontsize=9)
 axs[0].set_ylabel("AUC per simulated dataset")
-fig.tight_layout(); fig.savefig(FIG + "fig9_auc_distribution.png", bbox_inches="tight"); plt.close()
+fig.tight_layout(); fig.savefig(FIG + "fig3_auc_distribution.png", bbox_inches="tight"); plt.close()
 print("figures written")
