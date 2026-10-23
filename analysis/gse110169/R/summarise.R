@@ -8,7 +8,7 @@ ap <- function(s, y) { o <- order(-s); y <- y[o]; tp <- cumsum(y); sum((tp / seq
 PAIRS <- list(H1a = c("L3", "M5"), H1b = c("L3-P", "M5"), H2a = c("L2", "M6"), H2b = c("L2-P", "M6"), H2c = c("L2", "M4"), H2d = c("L2-P", "M4"),
               E1 = c("M5", "M0a"), E2 = c("L3", "L2"), E3 = c("W2", "M5"))
 perf <- list(); pairs <- list(); selr <- list(); sizes <- list()
-for (cn in c("C1", "C2", "C3")) { f <- file.path(OUT, paste0("oof_", cn, ".rds")); if (!file.exists(f)) next
+for (cn in c("C1", "C2", "C3", "C4")) { f <- file.path(OUT, paste0("oof_", cn, ".rds")); if (!file.exists(f)) next
   R <- readRDS(f); models <- names(R[[1]]$pred); reps <- sort(unique(sapply(R, `[[`, "rep")))
   sizes[[cn]] <- data.frame(contrast = cn, mean_test_pos = mean(sapply(reps, function(r) sum(unlist(lapply(Filter(function(x) x$rep == r, R), `[[`, "y"))))),
     mean_test_neg = mean(sapply(reps, function(r) sum(1 - unlist(lapply(Filter(function(x) x$rep == r, R), `[[`, "y"))))),

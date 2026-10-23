@@ -20,7 +20,8 @@ group <- s$group; batch <- model.matrix(~ batch, s)[, -1]
 
 CONTRASTS <- list(C1 = list(univ = c("SLE", "HC"), pos = c("SLE", "high"), neg = c("HC", "low")),
                   C2 = list(univ = c("SLE", "HC"), pos = c("SLE", "low"), neg = c("HC", "low")),
-                  C3 = list(univ = c("SLE", "RA", "HC"), pos = c("SLE", "low"), neg = c("RA", "low")))
+                  C3 = list(univ = c("SLE", "RA", "HC"), pos = c("SLE", "low"), neg = c("RA", "low")),
+                  C4 = list(univ = c("SLE", "RA", "HC"), pos = c("SLE", "any"), neg = c("RA", "any")))
 MODELS <- c("M0a", "M0c", "M1", "M2", "M3-score", "M3-boost", "M3-SVM", "M4", "M5", "M6",
             "W1", "W2", "L1", "L2", "L2-P", "L2-S", "L3", "L3-P")
 
@@ -34,8 +35,8 @@ run_fold <- function(job) {
   hc <- tru[group[tru] == "HC"]; Xi <- Xall[, collapse(tru, IFN_GENES)]
   Z <- sweep(sweep(Xi, 2, colMeans(Xi[hc, ])), 2, apply(Xi[hc, ], 2, sd), "/"); I <- rowMeans(Z)
   theta <- mean(I[hc]) + 2 * sd(I[hc]); status <- ifelse(I > theta, "high", "low")
-  pick <- function(idx) { p <- idx[group[idx] == ct$pos[1] & status[idx] == ct$pos[2]]
-    n <- idx[group[idx] == ct$neg[1] & status[idx] == ct$neg[2]]; list(i = c(p, n), y = c(rep(1, length(p)), rep(0, length(n)))) }
+  pick <- function(idx) { p <- idx[group[idx] == ct$pos[1] & (ct$pos[2] == "any" | status[idx] == ct$pos[2])]
+    n <- idx[group[idx] == ct$neg[1] & (ct$neg[2] == "any" | status[idx] == ct$neg[2])]; list(i = c(p, n), y = c(rep(1, length(p)), rep(0, length(n)))) }
   a <- pick(tru); b <- pick(teu); tr <- a$i; y <- a$y; te <- b$i
   if (length(unique(b$y)) < 2) return(NULL)
   ## gene-level data with in-fold probe choice; cell-composition scores (Section 2.4)
