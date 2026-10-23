@@ -26,11 +26,13 @@ stat <- function(Za, Zb, lam) {
     T3 = norm(pcor_mat(Za, NULL, lam) - pcor_mat(Zb, NULL, lam), "F"), T3P = norm(cor(Za) - cor(Zb), "F"))
 }
 dbic <- function(M) { P3 <- prcomp(M)$x[, 1:3]
-  b <- sapply(1:2, function(k) { m <- Mclust(P3, G = k, modelNames = "VVV", verbose = FALSE); if (is.null(m)) NA else -m$bic }); b[1] - b[2] }
+  b <- sapply(1:2, function(k) { m <- Mclust(P3, G = k, verbose = FALSE); if (is.null(m)) NA else -m$bic }); b[1] - b[2] }
 rows <- list()
-for (cn in names(CONTR)) { cc <- CONTR[[cn]]
+RUNS <- list(c("C1", "full"), c("C1", "no_IFN"), c("C2", "full"), c("C3", "full"))
+for (run in RUNS) { cn <- run[1]; adj <- run[2]; cc <- CONTR[[cn]]
   i1 <- which(group == cc[1] & status == cc[2]); i0 <- which(group == cc[3] & status == cc[4]); idx <- c(i1, i0); y <- c(rep(1, length(i1)), rep(0, length(i0)))
   covs <- cbind(sex = as.numeric(s$sex_inferred[idx] == "M"), model.matrix(~ batch, s[idx, ])[, -1], cells[idx, ], IFN = I[idx])
+  if (adj == "no_IFN") covs <- covs[, colnames(covs) != "IFN"]
   D <- cbind(1, covs)
   for (n in names(PW)) { X <- Xg[idx, PW[[n]]]; if (ncol(X) > 50) X <- X[, order(-apply(X, 2, var))[1:50]]
     X <- scale(X); R <- X - D %*% qr.solve(D, X)            # Freedman-Lane: residuals of the covariate-only model
@@ -38,11 +40,11 @@ for (cn in names(CONTR)) { cc <- CONTR[[cn]]
     for (b in 1:N_PERM) { yp <- sample(y); cnt <- cnt + (stat(R[yp == 1, ], R[yp == 0, ], lam) >= obs) }
     p <- (cnt + 1) / (N_PERM + 1)
     db <- c(pat = dbic(R[y == 1, ]), con = dbic(R[y == 0, ]))
-    rows[[length(rows) + 1]] <- data.frame(contrast = cn, pathway = sub("REACTOME_", "", n), n_pos = length(i1), n_neg = length(i0), genes = ncol(X),
+    rows[[length(rows) + 1]] <- data.frame(contrast = cn, adjustment = adj, pathway = sub("REACTOME_", "", n), n_pos = length(i1), n_neg = length(i0), genes = ncol(X),
       T1 = obs[1], T2 = obs[2], T3 = obs[3], T3P = obs[4], p_T1 = p[1], p_T2 = p[2], p_T3 = p[3], p_T3P = p[4],
       dBIC_pat = db[1], dBIC_con = db[2])
-    cat(cn, n, round(p, 4), "\n") } }
+    cat(cn, adj, n, round(p, 4), "\n") } }
 res <- do.call(rbind, rows)
-for (v in c("p_T1", "p_T2", "p_T3", "p_T3P")) res[[sub("p_", "q_", v)]] <- ave(res[[v]], res$contrast, FUN = function(p) p.adjust(p, "BH"))
+for (v in c("p_T1", "p_T2", "p_T3", "p_T3P")) res[[sub("p_", "q_", v)]] <- ave(res[[v]], paste(res$contrast, res$adjustment), FUN = function(p) p.adjust(p, "BH"))
 res$subgroup_flag <- res$dBIC_pat > 2 & res$dBIC_con <= 2
 write.csv(res, file.path(OUT, "population_tests.csv"), row.names = FALSE)

@@ -59,12 +59,13 @@ ggsave(file.path(FIG, "fig4_delta_auc.png"), p4, width = 10, height = 4.2, dpi =
 
 ## ---- Figure 5: population-level tests
 pt <- read.csv(file.path(OUT, "population_tests.csv"))
+pt <- pt[(pt$contrast == "C1" & pt$adjustment == "no_IFN") | (pt$contrast != "C1" & pt$adjustment == "full"), ]
 pl <- do.call(rbind, lapply(c("T1", "T2", "T3", "T3P"), function(t) data.frame(contrast = pt$contrast, pathway = pt$pathway, test = t, q = pt[[paste0("q_", t)]], flag = pt$subgroup_flag)))
 pl$test <- factor(pl$test, c("T1", "T2", "T3", "T3P"), c("Level\n(T1)", "Spread\n(T2)", "Structure,\npartial (T3)", "Structure,\nPearson"))
 pl$pathway <- gsub("_", " ", tolower(pl$pathway)); pl$sig <- ifelse(pl$q < 0.05, "*", "")
 p5 <- ggplot(pl, aes(test, pathway, fill = -log10(q))) + geom_tile(colour = "white") + geom_text(aes(label = sig), size = 5, vjust = 0.75) +
   facet_wrap(~ contrast, labeller = as_labeller(CLAB)) + scale_fill_gradient(low = "#F7FBFF", high = "#08306B", name = expression(-log[10]~q)) +
-  labs(x = NULL, y = NULL, caption = "* q < 0.05 (Benjamini-Hochberg within test and contrast); expression adjusted for sex, batch, cell scores and IFN score") +
+  labs(x = NULL, y = NULL, caption = "* q < 0.05 (Benjamini-Hochberg within test and contrast); expression adjusted for sex, batch and cell scores, and for the IFN score in C2 and C3") +
   theme(legend.position = "right")
 ggsave(file.path(FIG, "fig5_population_tests.png"), p5, width = 11, height = 3.8, dpi = 300, bg = "white")
 
