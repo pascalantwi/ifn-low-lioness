@@ -45,7 +45,7 @@ p3 <- ggplot(roc_df, aes(fpr, tpr, colour = model)) + geom_abline(colour = "grey
   scale_colour_manual(values = c(M0a = "#999999", M5 = "#0072B2", M6 = "#56B4E9", W2 = "#009E73", L3 = "#D55E00", `L3-P` = "#E69F00"),
     labels = c(M0a = "M0a IFN score", M5 = "M5 expression + IFN", M6 = "M6 regularized QDA", W2 = "W2 WGCNA modules", L3 = "L3 partial LIONESS + M5", `L3-P` = "L3-P Pearson LIONESS + M5"), name = NULL) +
   labs(x = "False-positive rate", y = "True-positive rate") + guides(colour = guide_legend(nrow = 2))
-ggsave(file.path(FIG, "fig3_roc.png"), p3, width = 10, height = 4.4, dpi = 300, bg = "white")
+ggsave(file.path(FIG, "figS1_roc.png"), p3, width = 10, height = 4.4, dpi = 300, bg = "white")
 
 ## ---- Figure 4: paired AUC differences (forest plot)
 pd <- read.csv(file.path(OUT, "paired_differences.csv"))
@@ -55,7 +55,7 @@ p4 <- ggplot(pd, aes(delta_AUC, comparison, colour = type)) + geom_vline(xinterc
   geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0.2) + geom_point(size = 2) +
   facet_wrap(~ contrast, labeller = as_labeller(CLAB)) + scale_colour_manual(values = c(`Primary (H1)` = "#D55E00", `Secondary (H2)` = "#0072B2", Exploratory = "#999999"), name = NULL) +
   labs(x = "Difference in AUC (95% CI, Nadeau-Bengio corrected)", y = NULL)
-ggsave(file.path(FIG, "fig4_delta_auc.png"), p4, width = 10, height = 4.2, dpi = 300, bg = "white")
+ggsave(file.path(FIG, "fig3_delta_auc.png"), p4, width = 10, height = 4.2, dpi = 300, bg = "white")
 
 ## ---- Figure 5: population-level tests
 pt <- read.csv(file.path(OUT, "population_tests.csv"))
@@ -67,7 +67,7 @@ p5 <- ggplot(pl, aes(test, pathway, fill = -log10(q))) + geom_tile(colour = "whi
   facet_wrap(~ contrast, labeller = as_labeller(CLAB)) + scale_fill_gradient(low = "#F7FBFF", high = "#08306B", name = expression(-log[10]~q)) +
   labs(x = NULL, y = NULL) +
   theme(legend.position = "right")
-ggsave(file.path(FIG, "fig5_population_tests.png"), p5, width = 11, height = 3.8, dpi = 300, bg = "white")
+ggsave(file.path(FIG, "fig4_population_tests.png"), p5, width = 11, height = 3.8, dpi = 300, bg = "white")
 
 ## ---- Figures 6-8: descriptive networks
 D <- readRDS(file.path(OUT, "descriptive.rds"))
@@ -81,7 +81,7 @@ p6 <- ggplot(hm, aes(c, r, fill = v)) + geom_tile() + scale_fill_gradient2(low =
   annotate("label", x = length(oo) - 0.5, y = 1.5, label = "IFN-low SLE", hjust = 1, vjust = 0, size = 3.2, fontface = "bold", label.size = 0) +
   annotate("label", x = 1.5, y = length(oo) - 0.5, label = "HC", hjust = 0, vjust = 1, size = 3.2, fontface = "bold", label.size = 0) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5), axis.text.y = element_text(size = 5), legend.position = "right")
-ggsave(file.path(FIG, "fig6_pcor_heatmap.png"), p6, width = 7.5, height = 7, dpi = 300, bg = "white")
+ggsave(file.path(FIG, "figS2_pcor_heatmap.png"), p6, width = 7.5, height = 7, dpi = 300, bg = "white")
 
 ## Figure 7 (differential networks) is drawn by network_figure.R
 
@@ -95,7 +95,7 @@ p8 <- ggplot(fl, aes(group, value, fill = group)) + geom_boxplot(outlier.size = 
   scale_fill_manual(values = c(HC = "#999999", `SLE IFN-low` = "#0072B2", `RA IFN-low` = "#009E73", `RA IFN-high` = "#56B4E9", `SLE IFN-high` = "#D55E00"), guide = "none") +
   labs(x = NULL, y = NULL) +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
-ggsave(file.path(FIG, "fig9_lioness_features.png"), p8, width = 6.5, height = 8, dpi = 300, bg = "white")
+ggsave(file.path(FIG, "figS3_lioness_features.png"), p8, width = 6.5, height = 8, dpi = 300, bg = "white")
 
 ## ---- Figure 9: selection frequency of pathways in the group-lasso models
 sl <- read.csv(file.path(OUT, "pathway_selection.csv")); sl <- sl[sl$model %in% c("M5", "L3", "L3-P"), ]
@@ -103,5 +103,5 @@ sl$feature <- gsub("_", " ", tolower(sub("REACTOME_", "", sl$feature))); sl$feat
 p9 <- ggplot(sl, aes(model, feature, fill = selected)) + geom_tile(colour = "white") + geom_text(aes(label = sprintf("%.0f", 100 * selected)), size = 2.6) +
   facet_wrap(~ contrast, labeller = as_labeller(CLAB)) + scale_fill_gradient(low = "white", high = "#D55E00", limits = c(0, 1), name = "Selected\n(fraction of folds)") +
   labs(x = NULL, y = NULL) + theme(legend.position = "right")
-ggsave(file.path(FIG, "fig10_selection.png"), p9, width = 11, height = 5, dpi = 300, bg = "white")
+ggsave(file.path(FIG, "figS4_selection.png"), p9, width = 11, height = 5, dpi = 300, bg = "white")
 cat("figures written\n")

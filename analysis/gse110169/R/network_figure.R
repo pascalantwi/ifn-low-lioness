@@ -1,4 +1,4 @@
-## Figure 7: differential co-expression networks (LIONESS-paper style) for IFN-low SLE versus healthy
+## Figures 5 and 6: differential co-expression networks (LIONESS-paper style) for IFN-low SLE versus healthy
 ## controls and versus IFN-low RA, with partial and Pearson correlation. Descriptive.
 here <- dirname(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE)))
 source(file.path(here, "lib.R")); suppressPackageStartupMessages({library(ggplot2); library(patchwork); library(igraph)})
@@ -54,8 +54,8 @@ panel <- function(comp, meas, compname, tag) {
     theme_void(base_size = 9) + theme(plot.title = element_text(face = "bold", size = 11, hjust = 0), plot.margin = margin(6, 6, 6, 6)) +
     labs(title = paste0(tag, "   ", meas))
 }
-for (cmp in list(c("HC", "HC", "fig7_network_sle_vs_hc.png"), c("RA IFN-low", "IFN-low RA", "fig8_network_sle_vs_ra.png"))) {
+for (cmp in list(c("HC", "HC", "fig5_network_sle_vs_hc.png"), c("RA IFN-low", "IFN-low RA", "fig6_network_sle_vs_ra.png"))) {
   p <- (panel(cmp[1], "Partial correlation", cmp[2], "A") | panel(cmp[1], "Pearson correlation", cmp[2], "B")) +
     plot_layout(guides = "collect") & theme(legend.position = "bottom", legend.box = "horizontal")
   ggsave(file.path(FIG, cmp[3]), p, width = 13, height = 7.6, dpi = 300, bg = "white") }
-cat("figures 7 and 8 written\n")
+cat("figures 5 and 6 written\n")
