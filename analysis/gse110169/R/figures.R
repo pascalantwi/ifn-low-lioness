@@ -7,7 +7,7 @@ s <- read.delim(file.path(ROOT, "data/GSE110169/processed/samples.tsv"))
 theme_set(theme_minimal(base_size = 10) + theme(panel.grid.minor = element_blank(), strip.text = element_text(face = "bold"),
   plot.title = element_text(face = "bold", size = 11), legend.position = "bottom"))
 OI <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
-CLAB <- c(C1 = "C1  IFN-high SLE vs HC (positive control)", C2 = "C2  IFN-low SLE vs HC (primary)", C3 = "C3  IFN-low SLE vs IFN-low RA")
+CLAB <- c(C1 = "C1: IFN-high SLE vs HC", C2 = "C2: IFN-low SLE vs HC", C3 = "C3: IFN-low SLE vs IFN-low RA")
 fam <- function(m) ifelse(grepl("^M0", m), "Baseline", ifelse(grepl("^M", m), "Expression", ifelse(grepl("^W", m), "Established network", "LIONESS")))
 FAMCOL <- c(Baseline = "#999999", Expression = "#0072B2", `Established network` = "#009E73", LIONESS = "#D55E00")
 ORDER <- c("M0a", "M0c", "M1", "M2", "M3-score", "M3-boost", "M3-SVM", "M4", "M5", "M6", "W1", "W2", "L1", "L2", "L2-P", "L2-S", "L3", "L3-P")
@@ -23,7 +23,7 @@ p1 <- ggplot(d1, aes(group, I)) + geom_violin(fill = "grey93", colour = NA, widt
   annotate("text", x = 0.55, y = ic$theta, label = "cutoff (HC mean + 2 SD)", vjust = -0.5, hjust = 0, size = 3) +
   geom_text(data = lab1, aes(group, max(d1$I) + 1.1, label = lab), size = 3, vjust = 1) + expand_limits(y = max(d1$I) + 1.2) +
   scale_colour_manual(values = c(`IFN-high` = "#D55E00", `IFN-low` = "#0072B2"), name = NULL) +
-  labs(x = NULL, y = "IFN score (equation 2)", title = "IFN score in GSE110169")
+  labs(x = NULL, y = "IFN score (equation 2)")
 ggsave(file.path(FIG, "fig1_ifn_score.png"), p1, width = 5.5, height = 4.2, dpi = 300, bg = "white")
 
 ## ---- Figure 2: AUC of all models in the three contrasts
@@ -65,7 +65,7 @@ pl$test <- factor(pl$test, c("T1", "T2", "T3", "T3P"), c("Level\n(T1)", "Spread\
 pl$pathway <- gsub("_", " ", tolower(pl$pathway)); pl$sig <- ifelse(pl$q < 0.05, "*", "")
 p5 <- ggplot(pl, aes(test, pathway, fill = -log10(q))) + geom_tile(colour = "white") + geom_text(aes(label = sig), size = 5, vjust = 0.75) +
   facet_wrap(~ contrast, labeller = as_labeller(CLAB)) + scale_fill_gradient(low = "#F7FBFF", high = "#08306B", name = expression(-log[10]~q)) +
-  labs(x = NULL, y = NULL, caption = "* q < 0.05 (Benjamini-Hochberg within test and contrast); expression adjusted for sex, batch and cell scores, and for the IFN score in C2 and C3") +
+  labs(x = NULL, y = NULL) +
   theme(legend.position = "right")
 ggsave(file.path(FIG, "fig5_population_tests.png"), p5, width = 11, height = 3.8, dpi = 300, bg = "white")
 
@@ -77,8 +77,9 @@ oo <- g[hc$order]; M <- matrix(NA, length(g), length(g), dimnames = list(oo, oo)
 M[lower.tri(M)] <- pc$HC[oo, oo][lower.tri(M)]; M[upper.tri(M)] <- pc$`SLE IFN-low`[oo, oo][upper.tri(M)]
 hm <- data.frame(expand.grid(r = oo, c = oo), v = as.vector(M)); hm$r <- factor(hm$r, oo); hm$c <- factor(hm$c, oo)
 p6 <- ggplot(hm, aes(c, r, fill = v)) + geom_tile() + scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", na.value = "grey90", name = "Partial\ncorrelation", limits = c(-1, 1) * max(abs(hm$v), na.rm = TRUE)) +
-  coord_equal() + labs(x = NULL, y = NULL, title = "Interferon alpha/beta signalling: partial correlations",
-    subtitle = "Below diagonal: healthy controls (IFN-low). Above diagonal: IFN-low SLE.\nConditioned on the IFN score and cell-composition scores.") +
+  coord_equal(clip = "off") + labs(x = NULL, y = NULL) +
+  annotate("label", x = length(oo) - 0.5, y = 1.5, label = "IFN-low SLE", hjust = 1, vjust = 0, size = 3.2, fontface = "bold", label.size = 0) +
+  annotate("label", x = 1.5, y = length(oo) - 0.5, label = "HC", hjust = 0, vjust = 1, size = 3.2, fontface = "bold", label.size = 0) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5), axis.text.y = element_text(size = 5), legend.position = "right")
 ggsave(file.path(FIG, "fig6_pcor_heatmap.png"), p6, width = 7.5, height = 7, dpi = 300, bg = "white")
 
@@ -92,9 +93,9 @@ fl$feature <- factor(fl$feature, c("DN score", "Mean |w|", "Largest eigenvalue",
 fl$panel <- factor(paste0(fl$feature, ", ", tolower(fl$measure)), unique(paste0(fl$feature, ", ", tolower(fl$measure))[order(fl$feature, fl$measure)]))
 p8 <- ggplot(fl, aes(group, value, fill = group)) + geom_boxplot(outlier.size = 0.5, width = 0.7) + facet_wrap(~ panel, scales = "free_y", ncol = 2) +
   scale_fill_manual(values = c(HC = "#999999", `SLE IFN-low` = "#0072B2", `RA IFN-low` = "#009E73", `RA IFN-high` = "#56B4E9", `SLE IFN-high` = "#D55E00"), guide = "none") +
-  labs(x = NULL, y = NULL, title = "LIONESS network features by group", subtitle = "Interferon alpha/beta signalling; balanced reference of HC and IFN-low SLE (descriptive)") +
+  labs(x = NULL, y = NULL) +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
-ggsave(file.path(FIG, "fig8_lioness_features.png"), p8, width = 6.5, height = 8, dpi = 300, bg = "white")
+ggsave(file.path(FIG, "fig9_lioness_features.png"), p8, width = 6.5, height = 8, dpi = 300, bg = "white")
 
 ## ---- Figure 9: selection frequency of pathways in the group-lasso models
 sl <- read.csv(file.path(OUT, "pathway_selection.csv")); sl <- sl[sl$model %in% c("M5", "L3", "L3-P"), ]
@@ -102,5 +103,5 @@ sl$feature <- gsub("_", " ", tolower(sub("REACTOME_", "", sl$feature))); sl$feat
 p9 <- ggplot(sl, aes(model, feature, fill = selected)) + geom_tile(colour = "white") + geom_text(aes(label = sprintf("%.0f", 100 * selected)), size = 2.6) +
   facet_wrap(~ contrast, labeller = as_labeller(CLAB)) + scale_fill_gradient(low = "white", high = "#D55E00", limits = c(0, 1), name = "Selected\n(fraction of folds)") +
   labs(x = NULL, y = NULL) + theme(legend.position = "right")
-ggsave(file.path(FIG, "fig9_selection.png"), p9, width = 11, height = 5, dpi = 300, bg = "white")
+ggsave(file.path(FIG, "fig10_selection.png"), p9, width = 11, height = 5, dpi = 300, bg = "white")
 cat("figures written\n")

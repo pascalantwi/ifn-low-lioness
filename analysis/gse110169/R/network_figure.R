@@ -49,17 +49,13 @@ panel <- function(comp, meas, compname, tag) {
     scale_colour_manual(values = c(`Stronger in IFN-low SLE` = "#D55E00", `Weaker in IFN-low SLE` = "#0072B2"), name = "Edge", drop = FALSE) +
     scale_linewidth(range = c(0.4, 2.6), limits = c(0, 0.8), breaks = c(0.2, 0.4, 0.6), name = expression("|" * Delta * " correlation|")) +
     scale_fill_gradient2(low = "#9970AB", mid = "#F7F7F7", high = "#5AAE61", limits = c(-1.2, 1.2), oob = scales::squish,
-      name = "Gene expression,\nIFN-low SLE vs comparator\n(standardized difference)") +
+      name = "Expression difference\n(standardized)") + guides(fill = guide_colourbar(barwidth = 8, barheight = 0.6, title.position = "top"), colour = guide_legend(title.position = "top", override.aes = list(linewidth = 1.5)), linewidth = guide_legend(title.position = "top")) +
     coord_equal(clip = "off") + scale_x_continuous(expand = expansion(0.1)) + scale_y_continuous(expand = expansion(0.1)) +
-    theme_void(base_size = 9) + theme(plot.title = element_text(face = "bold", size = 10, hjust = 0.5), plot.margin = margin(6, 6, 6, 6)) +
-    labs(title = paste0(tag, "  IFN-low SLE vs ", compname, ": ", sub("Partial", "partial", meas)))
+    theme_void(base_size = 9) + theme(plot.title = element_text(face = "bold", size = 11, hjust = 0), plot.margin = margin(6, 6, 6, 6)) +
+    labs(title = paste0(tag, "   ", meas))
 }
-p <- (panel("HC", "Partial correlation", "HC", "A") | panel("HC", "Pearson correlation", "HC", "B")) /
-     (panel("RA IFN-low", "Partial correlation", "IFN-low RA", "C") | panel("RA IFN-low", "Pearson correlation", "IFN-low RA", "D")) +
-  plot_layout(guides = "collect") +
-  plot_annotation(title = "Differential co-expression networks of interferon alpha/beta signalling",
-    subtitle = "Edges: the 30 gene pairs with the largest change in correlation in each comparison (orange, stronger in IFN-low SLE; blue, weaker).\nNodes: genes, coloured by the difference in expression (green, higher in IFN-low SLE; purple, lower). Partial correlations are\nconditioned on the IFN score and cell-composition scores. Descriptive.",
-    theme = theme(plot.title = element_text(face = "bold", size = 13), plot.subtitle = element_text(size = 9, colour = "grey30"))) &
-  theme(legend.position = "right")
-ggsave(file.path(FIG, "fig7_differential_network.png"), p, width = 13, height = 12.5, dpi = 300, bg = "white")
-cat("figure 7 written\n")
+for (cmp in list(c("HC", "HC", "fig7_network_sle_vs_hc.png"), c("RA IFN-low", "IFN-low RA", "fig8_network_sle_vs_ra.png"))) {
+  p <- (panel(cmp[1], "Partial correlation", cmp[2], "A") | panel(cmp[1], "Pearson correlation", cmp[2], "B")) +
+    plot_layout(guides = "collect") & theme(legend.position = "bottom", legend.box = "horizontal")
+  ggsave(file.path(FIG, cmp[3]), p, width = 13, height = 7.6, dpi = 300, bg = "white") }
+cat("figures 7 and 8 written\n")

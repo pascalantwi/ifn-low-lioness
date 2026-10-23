@@ -446,7 +446,7 @@ The IFN score separated the 243 participants of GSE110169 clearly by diagnosis (
 
 ![Figure 1](figures/fig1_ifn_score.png)
 
-**Figure 1.** IFN score (equation 2) of each participant of GSE110169 by group. The dashed line is the cutoff of equation (3), the mean plus two standard deviations of the score in the healthy controls; points above it are IFN-high. The numbers above each group give the counts of IFN-high and IFN-low participants.
+**Figure 1. IFN score of the participants of GSE110169 by group.** Each point is one participant; grey shapes show the distribution of the score. The dashed line marks the cutoff of equation (3), the mean plus two standard deviations of the score in the healthy controls (HC); participants above the line are classified as IFN-high (orange) and those below as IFN-low (blue). The numbers above each group are the counts of IFN-high and IFN-low participants. RA, rheumatoid arthritis; SLE, systemic lupus erythematosus.
 
 <a id="table-1"></a>
 
@@ -495,7 +495,7 @@ In contrast C1, the IFN score alone (M0a) separated IFN-high SLE patients from c
 
 ![Figure 2](figures/fig2_auc_all_models.png)
 
-**Figure 2.** AUC of each model in the three contrasts. Points show the mean over 10 repeats of 5-fold cross-validation and bars the range over the repeats; colours show the model group. The dotted line marks an AUC of 0.5.
+**Figure 2. Classification performance of all models in the three contrasts.** Points show the mean area under the receiver operating characteristic curve (AUC) over 10 repeats of 5-fold nested cross-validation, and horizontal bars show the range over the repeats. Colours indicate the model group: baselines, expression-based comparators, established network methods and LIONESS models ([Supplementary Table S2](#table-s2)). The dotted line marks an AUC of 0.5. C1, IFN-high SLE versus healthy controls (positive control); C2, IFN-low SLE versus healthy controls (primary contrast); C3, IFN-low SLE versus IFN-low RA.
 
 <a id="sec-3-3"></a>
 
@@ -507,7 +507,7 @@ In contrast C2, the residual IFN score alone (M0a) reached an AUC of 0.78 ([Tabl
 
 ![Figure 3](figures/fig3_roc.png)
 
-**Figure 3.** Receiver operating characteristic curves of the IFN score (M0a), the reference model (M5), the quadratic classifier (M6), the WGCNA module model (W2) and the combined LIONESS models (L3 and L3-P), from out-of-fold predictions pooled over the 10 repeats.
+**Figure 3. Receiver operating characteristic curves of the main models.** Curves are computed from out-of-fold predictions pooled over the 10 repeats of cross-validation for the IFN-score baseline (M0a), the reference model of pathway expression and IFN score (M5), regularized quadratic discriminant analysis (M6), WGCNA module eigengenes (W2), and the combined LIONESS models with partial-correlation (L3) and Pearson (L3-P) networks. The dotted line is the line of no discrimination.
 
 The pre-specified comparisons are summarized in [Table 3](#table-3) and [Figure 4](#figure-4). For the primary hypothesis H1, the difference in AUC between L3 and M5 was -0.03 (95% CI -0.13 to 0.06), and between L3-P and M5 it was -0.02 (95% CI -0.08 to 0.04); neither was statistically significant after Holm correction (adjusted p = 0.91 for both). For the secondary hypothesis H2, L2 and L2-P did not differ significantly from M6, with differences of -0.13 (95% CI -0.35 to 0.10) and -0.01 (95% CI -0.28 to 0.25), and both had lower AUCs than M4, with differences of -0.29 (95% CI -0.46 to -0.11) and -0.17 (95% CI -0.29 to -0.04) (adjusted p = 0.005 and 0.028).
 
@@ -540,13 +540,13 @@ The pre-specified comparisons are summarized in [Table 3](#table-3) and [Figure 
 
 ![Figure 4](figures/fig4_delta_auc.png)
 
-**Figure 4.** Differences in AUC between models with 95% confidence intervals, for the primary (H1), secondary (H2) and exploratory comparisons in each contrast.
+**Figure 4. Differences in AUC between pre-specified pairs of models.** Points show the difference in mean AUC (first model minus second) and bars the 95% confidence interval with the corrected variance of Nadeau and Bengio (equations 24 and 25). Primary comparisons (H1) test whether LIONESS networks add to pathway expression and the IFN score; secondary comparisons (H2) compare network-only models with the quadratic classifier (M6) and the distance from health (M4). In C1, the H1 differences are zero because both models reached an AUC of 1.00.
 
 <a id="sec-3-4"></a>
 
 ### 3.4 IFN-low SLE versus IFN-low RA
 
-In contrast C3, the residual IFN score alone (M0a) reached an AUC of 0.71, and the expression-based models reached higher values: 0.89 for M5, 0.89 for M2, 0.87 for M1 and 0.86 for M3-SVM ([Table 2](#table-2), [Figure 2](#figure-2)). The difference between M5 and M0a was 0.18 (95% CI 0.04 to 0.32). The established network methods reached 0.81 (W1) and 0.81 (W2). The LIONESS models based on network features alone reached between 0.50 and 0.56, and the combined models reached 0.86 (L3) and 0.89 (L3-P). The differences between the combined models and M5 were -0.03 (95% CI -0.09 to 0.03) for L3 and -0.01 (95% CI -0.06 to 0.05) for L3-P ([Table 3](#table-3)). In the group-lasso models, the expression of *interferon gamma signalling* was selected in 96% of the folds of M5 ([Figure 9](#figure-9)).
+In contrast C3, the residual IFN score alone (M0a) reached an AUC of 0.71, and the expression-based models reached higher values: 0.89 for M5, 0.89 for M2, 0.87 for M1 and 0.86 for M3-SVM ([Table 2](#table-2), [Figure 2](#figure-2)). The difference between M5 and M0a was 0.18 (95% CI 0.04 to 0.32). The established network methods reached 0.81 (W1) and 0.81 (W2). The LIONESS models based on network features alone reached between 0.50 and 0.56, and the combined models reached 0.86 (L3) and 0.89 (L3-P). The differences between the combined models and M5 were -0.03 (95% CI -0.09 to 0.03) for L3 and -0.01 (95% CI -0.06 to 0.05) for L3-P ([Table 3](#table-3)). In the group-lasso models, the expression of *interferon gamma signalling* was selected in 96% of the folds of M5 ([Figure 10](#figure-10)).
 
 <a id="sec-3-5"></a>
 
@@ -583,43 +583,49 @@ The results of the three layers of tests are given in [Table 4](#table-4) and [F
 
 ![Figure 5](figures/fig5_population_tests.png)
 
-**Figure 5.** Population-level tests for each sub-pathway and contrast, shown as −log10 q. Asterisks mark q < 0.05.
+**Figure 5. Population-level differences in level, spread and correlation structure.** Each cell shows −log10 of the false discovery rate (q) for one sub-pathway, test and contrast (equations 26–28; 10,000 Freedman–Lane permutations; Benjamini–Hochberg within each test and contrast). Asterisks mark q < 0.05. Expression was adjusted for sex, batch and the cell-composition scores, and in C2 and C3 also for the IFN score; C1 is shown without adjustment for the IFN score, which defines its groups.
 
 <a id="sec-3-6"></a>
 
 ### 3.6 Network structure
 
-The group-level partial correlations of *interferon alpha/beta signalling* in healthy controls and IFN-low SLE patients are compared in [Figure 6](#figure-6). Most partial correlations were small in both groups, with absolute values below about 0.25. The gene pairs with the largest changes between groups are shown as differential networks in [Figure 7](#figure-7), for IFN-low SLE against controls and against IFN-low RA, with both association measures. The largest partial-correlation changes against controls involved the HLA class I genes (HLA-A, HLA-B and HLA-C), STAT2, EIF2AK2, IRF5, IRF8 and the suppressors of cytokine signalling SOCS1 and SOCS3; the Pearson and partial-correlation networks shared 6 of their 30 gene pairs against controls and 5 of 30 against IFN-low RA. In the full-data LIONESS networks ([Figure 8](#figure-8)), the four primary features of the partial-correlation networks had similar distributions in all groups, whereas the Pearson features, in particular the mean absolute edge weight, the largest eigenvalue and the distance from the reference, were higher in IFN-high SLE patients than in the other groups.
+The group-level partial correlations of *interferon alpha/beta signalling* in healthy controls and IFN-low SLE patients are compared in [Figure 6](#figure-6). Most partial correlations were small in both groups, with absolute values below about 0.25. The gene pairs with the largest changes between groups are shown as differential networks, with both association measures, for IFN-low SLE against controls in [Figure 7](#figure-7) and against IFN-low RA in [Figure 8](#figure-8). The largest partial-correlation changes against controls involved the HLA class I genes (HLA-A, HLA-B and HLA-C), STAT2, EIF2AK2, IRF5, IRF8 and the suppressors of cytokine signalling SOCS1 and SOCS3; the Pearson and partial-correlation networks shared 6 of their 30 gene pairs against controls and 5 of 30 against IFN-low RA. In the full-data LIONESS networks ([Figure 9](#figure-9)), the four primary features of the partial-correlation networks had similar distributions in all groups, whereas the Pearson features, in particular the mean absolute edge weight, the largest eigenvalue and the distance from the reference, were higher in IFN-high SLE patients than in the other groups.
 
 <a id="figure-6"></a>
 
 ![Figure 6](figures/fig6_pcor_heatmap.png)
 
-**Figure 6.** Partial correlations among the genes of *interferon alpha/beta signalling* in healthy controls (below the diagonal) and IFN-low SLE patients (above the diagonal), conditioned on the IFN score and the cell-composition scores. Genes are ordered by hierarchical clustering.
+**Figure 6. Partial correlations among the genes of interferon alpha/beta signalling in healthy controls and IFN-low SLE patients.** The upper-left triangle shows the group-level partial correlations in IFN-low healthy controls (HC) and the lower-right triangle those in IFN-low SLE patients, both conditioned on the IFN score and the cell-composition scores. Genes are ordered by hierarchical clustering of the average absolute partial correlation of the two groups.
 
 <a id="figure-7"></a>
 
-![Figure 7](figures/fig7_differential_network.png)
+![Figure 7](figures/fig7_network_sle_vs_hc.png)
 
-**Figure 7.** Differential co-expression networks of *interferon alpha/beta signalling*. (A, B) IFN-low SLE versus healthy controls; (C, D) IFN-low SLE versus IFN-low RA; (A, C) partial correlation, conditioned on the IFN score and cell-composition scores; (B, D) Pearson correlation. Each panel shows the 30 gene pairs with the largest absolute change in correlation; orange edges are stronger and blue edges weaker in IFN-low SLE, and edge width shows the size of the change. Node colour shows the standardized difference in gene expression (green, higher in IFN-low SLE; purple, lower). Descriptive.
+**Figure 7. Differential co-expression networks of interferon alpha/beta signalling in IFN-low SLE patients compared with healthy controls.** (A) Partial correlation, conditioned on the IFN score and the cell-composition scores. (B) Pearson correlation. Each panel shows the 30 gene pairs with the largest absolute difference in group-level correlation between IFN-low SLE patients and IFN-low healthy controls. Orange edges are stronger and blue edges weaker in IFN-low SLE, and edge width is proportional to the absolute difference. Node colour shows the standardized difference in gene expression between the groups (green, higher in IFN-low SLE; purple, lower). The networks are descriptive and were not used for model evaluation.
 
 <a id="figure-8"></a>
 
-![Figure 8](figures/fig8_lioness_features.png)
+![Figure 8](figures/fig8_network_sle_vs_ra.png)
 
-**Figure 8.** The four primary LIONESS network features (equations 16–19) of *interferon alpha/beta signalling* by group, from partial-correlation and Pearson networks estimated with a balanced reference of healthy controls and IFN-low SLE patients; other groups were added one sample at a time. Descriptive.
+**Figure 8. Differential co-expression networks of interferon alpha/beta signalling in IFN-low SLE patients compared with IFN-low RA patients.** (A) Partial correlation, conditioned on the IFN score and the cell-composition scores. (B) Pearson correlation. Edges, edge widths and node colours are defined as in [Figure 7](#figure-7), with IFN-low RA patients as the comparator group. Descriptive.
+
+<a id="figure-9"></a>
+
+![Figure 9](figures/fig9_lioness_features.png)
+
+**Figure 9. LIONESS network features by group.** Distributions of the four primary features (equations 16–19) of the interferon alpha/beta signalling networks, for partial-correlation and Pearson networks. Networks were estimated with a class-balanced reference of IFN-low healthy controls and IFN-low SLE patients, and the samples of the other groups were added one at a time (add-one-in form of equation 13). Boxes show the median and interquartile range, and whiskers extend to 1.5 times the interquartile range. Descriptive.
 
 <a id="sec-3-7"></a>
 
 ### 3.7 Pathway selection
 
-The selection frequencies of the sub-pathways in the group-lasso models are shown in [Figure 9](#figure-9). In C2, the IFN score was selected in 92% of the folds of L3, 84% of L3-P and 76% of M5, and each network group was selected in 10% to 36% of the folds of the combined models. In C3, the network groups were selected more often, in 26% to 90% of the folds of L3 and L3-P, together with the expression of *interferon gamma signalling* (96% to 100%) and *antiviral mechanism by IFN-stimulated genes* (70% to 82%).
+The selection frequencies of the sub-pathways in the group-lasso models are shown in [Figure 10](#figure-10). In C2, the IFN score was selected in 92% of the folds of L3, 84% of L3-P and 76% of M5, and each network group was selected in 10% to 36% of the folds of the combined models. In C3, the network groups were selected more often, in 26% to 90% of the folds of L3 and L3-P, together with the expression of *interferon gamma signalling* (96% to 100%) and *antiviral mechanism by IFN-stimulated genes* (70% to 82%).
 
-<a id="figure-9"></a>
+<a id="figure-10"></a>
 
-![Figure 9](figures/fig9_selection.png)
+![Figure 10](figures/fig10_selection.png)
 
-**Figure 9.** Proportion of the 50 outer folds in which each group of features was selected by the group lasso (equation 22) in the reference model M5 and the combined LIONESS models L3 and L3-P. "net:" denotes the network features and "expr:" the expression of a sub-pathway.
+**Figure 10. Selection of feature groups by the group lasso.** Each cell shows the percentage of the 50 outer folds in which a group of features was selected (equation 22) in the reference model M5 and the combined LIONESS models L3 and L3-P. "net:" denotes the four primary network features of a sub-pathway, "expr:" the expression of its genes, and "ifn" the IFN score.
 
 <a id="sec-3-8"></a>
 
