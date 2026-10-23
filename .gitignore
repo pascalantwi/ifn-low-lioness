@@ -3,3 +3,4 @@ simulation/full/run.log
 simulation/full/results.jsonl
 analysis/gse110169/results/run.log
 analysis/gse110169/results/poptests.log
+analysis/gse110169/results/*.log
